@@ -112,7 +112,7 @@ module LinkedList
     end
 
     def contains?(value)
-      raise StandardError, "Checking empty list" if empty?
+      return false if empty?
 
       search(value) ? true : false
     end
@@ -134,6 +134,7 @@ module LinkedList
         node = node.next_node
         traversal << "( #{node.value} ) -> "
       end
+
       traversal << "nil.\n"
     end
 

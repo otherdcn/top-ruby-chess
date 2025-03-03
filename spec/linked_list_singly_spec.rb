@@ -1,4 +1,4 @@
-require_relative "../lib/linked_list_singly.rb"
+require_relative "../lib/linked_list_singly"
 
 describe LinkedList::Singly do
   describe "attributes" do
@@ -302,10 +302,10 @@ describe LinkedList::Singly do
   end
 
   describe "#contains?" do
-    it "raises StandardError if list is  empty" do
+    it "returns false if list is  empty" do
       list = LinkedList::Singly.new
 
-      expect { list.contains?("apple") }.to raise_error(StandardError)
+      expect(list.contains?("apple")).to be false
     end
 
     it "returns true for apple" do
