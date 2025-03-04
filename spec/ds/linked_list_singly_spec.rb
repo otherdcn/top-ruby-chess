@@ -1,4 +1,4 @@
-require_relative "../lib/linked_list_singly"
+require_relative "../../lib/ds/linked_list_singly"
 
 describe LinkedList::Singly do
   describe "attributes" do

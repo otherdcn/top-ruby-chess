@@ -1,4 +1,4 @@
-require_relative "../lib/graph"
+require_relative "../../lib/ds/graph"
 
 RSpec.describe Vertex do
   describe "#<=>" do
