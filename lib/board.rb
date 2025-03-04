@@ -50,5 +50,8 @@ class ChessBoard
   end
 
   def remove_from_square(square_id)
+    raise StandardError, "No such square (#{square_id}) present" if data[square_id].nil?
+
+    @data[square_id] = ""
   end
 end

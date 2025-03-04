@@ -55,4 +55,26 @@ RSpec.describe ChessBoard do
       it { expect { subject.add_to_square(valid_square_id, chess_piece) }.to change { subject.data[valid_square_id] }.from("").to("knight_white") }
     end
   end
+
+  describe "#remove_from_square" do
+    subject { described_class.new }
+
+    context "when square_id input is invalid" do
+      let(:invalid_square_id) { "z20" }
+
+      it { expect { subject.remove_from_square(invalid_square_id) }
+                  .to raise_error(StandardError,
+                                  "No such square (#{invalid_square_id}) present") }
+    end
+
+    context "when square_id input is valid" do
+      before do
+        subject.data[valid_square_id] = "knight_white"
+      end
+
+      let(:valid_square_id) { "c6" }
+
+      it { expect { subject.remove_from_square(valid_square_id) }.to change { subject.data[valid_square_id] }.from("knight_white").to("") }
+    end
+  end
 end
