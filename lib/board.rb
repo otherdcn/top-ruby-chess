@@ -42,4 +42,13 @@ class ChessBoard
 
     data[square_id]
   end
+
+  def add_to_square(square_id, chess_piece)
+    raise StandardError, "No such square (#{square_id}) present" if data[square_id].nil?
+
+    @data[square_id] = chess_piece
+  end
+
+  def remove_from_square(square_id)
+  end
 end

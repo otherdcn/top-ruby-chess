@@ -15,10 +15,10 @@ RSpec.describe ChessBoard do
     end
   end
 
-  describe "check_square" do
+  describe "#check_square" do
     subject { described_class.new }
 
-    context "when input is invalid" do
+    context "when square_id input is invalid" do
       let(:invalid_square_id) { "z20" }
 
       it { expect { subject.check_square(invalid_square_id) }
@@ -26,7 +26,7 @@ RSpec.describe ChessBoard do
                                   "No such square (#{invalid_square_id}) present") }
     end
 
-    context "when input is valid" do
+    context "when square_id input is valid" do
       let(:valid_square_id) { "d4" }
 
       before do
@@ -35,6 +35,24 @@ RSpec.describe ChessBoard do
 
       it { expect(subject.check_square(valid_square_id)).to_not be_nil }
       it { expect(subject.check_square(valid_square_id)).to eq "test_data" }
+    end
+  end
+
+  describe "#add_to_square" do
+    let(:chess_piece) { "knight_white" }
+
+    context "when square_id input is invalid" do
+      let(:invalid_square_id) { "z20" }
+
+      it { expect { subject.add_to_square(invalid_square_id, chess_piece) }
+                  .to raise_error(StandardError,
+                                  "No such square (#{invalid_square_id}) present") }
+    end
+
+    context "when square_id input is valid" do
+      let(:valid_square_id) { "c6" }
+
+      it { expect { subject.add_to_square(valid_square_id, chess_piece) }.to change { subject.data[valid_square_id] }.from("").to("knight_white") }
     end
   end
 end
