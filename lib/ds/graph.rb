@@ -25,14 +25,18 @@ class Vertex
   end
 end
 
-class Graph
-  attr_accessor :adjacency_list
+module Graph
+  def adjacency_list
+    @adjacency_list ||= ({})
+  end
 
-  def initialize
-    self.adjacency_list = ({})
+  def empty?
+    adjacency_list.empty?
   end
 
   def add_vertex(key, data)
+    # Bad Dependency
+    # Unjustified attachment to type for the following: vertex and edges
     vertex = Vertex.new(data)
     edges =  LinkedList::Singly.new
 
@@ -42,14 +46,17 @@ class Graph
   end
 
   def vertex(key)
-    return if adjacency_list[key].nil?
+    raise StandardError, "Vertex not "\
+      "present" unless adjacency_list.key? key
 
     adjacency_list[key][:vertex]
   end
 
   def add_edge(source, target)
-    raise StandardError, "Source vertex not present" unless adjacency_list.key? source
-    raise StandardError, "Target vertex not present" unless adjacency_list.key? target
+    raise StandardError, "Source vertex "\
+      "not present" unless adjacency_list.key? source
+    raise StandardError, "Target vertex "\
+      "not present" unless adjacency_list.key? target
     return nil if vertices_connected?(source, target)
 
     adjacency_list[source][:edges].append(target)
@@ -67,7 +74,9 @@ class Graph
   end
 
   def adjacent_vertices(key)
-    return if adjacency_list[key].nil?
+    raise StandardError, "Vertex not "\
+      "present" unless adjacency_list.key? key
+
     return if adjacency_list[key][:edges].empty?
 
     vertices_list = []

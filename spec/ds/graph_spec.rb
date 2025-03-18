@@ -27,10 +27,25 @@ RSpec.describe Vertex do
   end
 end
 
-RSpec.describe Graph do
-    #let(:random_update) { instance_double(RandomNumber, value: 3) }
-    #let(:new_number) { 76 }
-    #subject(:game_update) { described_class.new(1, 100, random_update) }
+class GraphTest
+  include Graph
+end
+
+RSpec.describe GraphTest do
+  describe "#empty?" do
+    subject { described_class.new }
+
+    it "returns true when instantiated" do
+      expect(subject).to be_empty
+    end
+
+    it "returns false when vertex is added" do
+      subject.add_vertex(:first_vertex, 100)
+
+      expect(subject).to_not be_empty
+    end
+  end
+
   describe "#add_vertex" do
     subject { described_class.new }
 
@@ -66,7 +81,8 @@ RSpec.describe Graph do
 
     context "when key is not present in adjacency list hash" do
       it "returns the nil" do
-        expect(subject.vertex(:key)).to be_nil
+        expect { subject.vertex(:key) }.
+          to raise_error(StandardError, "Vertex not present")
       end
     end
   end
@@ -152,11 +168,12 @@ RSpec.describe Graph do
       before do
         subject.add_vertex(:source, 100)
         subject.add_vertex(:target, 125)
-        allow(edge_list_2).to receive(:contains?).with(:target).and_return(true).once
       end
 
-      xit "sends an outgoing message: contains?" do
-        expect(edge_list_2).to receive(:contains?)
+      it "sends an outgoing message: contains?" do
+        # Short fix. Should use Dependency Injection at some point
+        expect_any_instance_of(LinkedList::Singly)
+          .to receive(:contains?)
         subject.vertices_connected?(:source, :target)
       end
 
@@ -187,7 +204,8 @@ RSpec.describe Graph do
 
     context "when vertex is not present in the graph" do
       it "returns nil" do
-        expect(subject.adjacent_vertices(:key)).to be_nil
+        expect{ subject.adjacent_vertices(:key) }
+          .to raise_error(StandardError, "Vertex not present")
       end
     end
 
@@ -201,7 +219,13 @@ RSpec.describe Graph do
         end
       end
 
-      it "sends outgoing message to LinkedList::Singly object"
+      it "sends outgoing message to LinkedList::Singly object" do
+        # Short fix. Should use Dependency Injection at some point
+        expect_any_instance_of(LinkedList::Singly)
+          .to receive(:each)
+
+        subject.adjacent_vertices(:first)
+      end
 
       it "returns a list of all vertices adjacent/connected to the vertex" do
         adjacent_vertices = subject.adjacent_vertices(:first)

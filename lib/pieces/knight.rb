@@ -1,8 +1,10 @@
+require_relative '../ds/graph'
+
 module ChessPiece
   class Error < StandardError; end
 
-  class KnightGraph
-    attr_accessor :graph, :board
+  class Knight
+    include Graph
 
     MOVES = {
       up_left: [2, -1],
@@ -15,30 +17,39 @@ module ChessPiece
       down_right: [-2, 1]
     }.freeze
 
-    def initialize(graph:, board:)
-      self.graph = graph
-      self.board = board
+    def reachable?(from:, to:)
+      raise ChessPiece::Error, "Start square #{from} " \
+      "not present" unless graph_of_knight_moves(from)
+
+      raise ChessPiece::Error, "Destination square #{to} " \
+      "not present" unless graph_of_knight_moves(to)
+
+      squares_connected?(from, to)
     end
 
-    def populate_graph
-      add_board_positions
-      add_possible_movements_per_board_positions
+    def next_moves(from:)
+      immediate_squares(from)
+    end
+
+    def populate_graph(board:)
+      add_board_positions(board)
+      add_possible_movements_per_board_positions(board)
     end
 
     private
 
-    def add_board_positions
+    def add_board_positions(board)
       board.each_with_index do |row, row_idx|
         row.each_with_index do |col, col_idx|
           square_id = col
           square_coord = [col_idx, row_idx]
 
-          add_vertex_to_graph(square_id, square_coord)
+          add_square_to_board(square_id, square_coord)
         end
       end
     end
 
-    def add_possible_movements_per_board_positions
+    def add_possible_movements_per_board_positions(board)
       board.each_with_index do |row, row_idx|
         row.each_with_index do |col, col_idx|
           square_id = col
@@ -49,7 +60,7 @@ module ChessPiece
             target_file, target_rank = target_coord
 
             target_id = board[target_rank][target_file]
-            add_edge_to_graph(square_id, target_id)
+            add_square_to_movements(square_id, target_id)
           end
         end
       end
@@ -70,52 +81,28 @@ module ChessPiece
       squares
     end
 
-    def within_boundary?(coord, size = board.size)
+    def within_boundary?(coord, size = 8)
       coord.all? { |point| point.between?(0, size - 1) }
     end
 
-    def add_vertex_to_graph(square_id, square_coord)
-      graph.add_vertex(square_id, square_coord)
-    end
-
-    def add_edge_to_graph(square_id, target_id)
-      graph.add_edge(square_id, target_id)
-    end
-  end
-
-  class KnightMoves
-    attr_accessor :graph
-
-    def initialize(graph:)
-      self.graph = graph
-    end
-
-    def reachable?(from:, to:)
-      raise ChessPiece::Error, "Start square #{from} " \
-      "not present" unless graph_of_knight_moves(from)
-
-      raise ChessPiece::Error, "Destination square #{to} " \
-      "not present" unless graph_of_knight_moves(to)
-
-      vertices_connected?(from, to)
-    end
-
-    def next_moves(from:)
-      adjacent_vertices(from)
-    end
-
-    private
-
     def graph_of_knight_moves(key)
-      graph.adjacency_list[key]
+      adjacency_list[key]
     end
 
-    def vertices_connected?(start_square, destination_square)
-      graph.vertices_connected?(start_square, destination_square)
+    def squares_connected?(start_square, destination_square)
+      vertices_connected?(start_square, destination_square)
     end
 
-    def adjacent_vertices(key)
-      graph.adjacent_vertices(key)
+    def immediate_squares(key)
+      adjacent_vertices(key)
+    end
+
+    def add_square_to_board(square_id, square_coord)
+      add_vertex(square_id, square_coord)
+    end
+
+    def add_square_to_movements(square_id, target_id)
+      add_edge(square_id, target_id)
     end
   end
 end

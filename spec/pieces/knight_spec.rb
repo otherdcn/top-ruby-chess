@@ -1,8 +1,7 @@
 require_relative "../../lib/pieces/knight"
 require_relative "../../lib/ds/graph"
-require_relative "../../lib/board"
 
-RSpec.describe ChessPiece::KnightGraph do
+RSpec.describe ChessPiece::Knight do
   def create_2d_board
     column_files = "a".upto("h").map(&:to_s)
     row_ranks = "1".upto("8").map(&:to_s).reverse
@@ -26,37 +25,25 @@ RSpec.describe ChessPiece::KnightGraph do
     board
   end
 
-  def create_knight_moves_graph
-    knight = described_class.new(graph: Graph.new,
-                                 board: ChessBoard.new.board)
+  def create_knight
+    knight = described_class.new
+    knight.populate_graph(board: create_2d_board)
+
     knight
   end
 
   describe "#populate_graph" do
     it "fills the graph" do
-      knight_graph = create_knight_moves_graph
+      knight_graph = create_knight
 
-      knight_graph.populate_graph
+      knight_graph.populate_graph(board: create_2d_board)
 
-      # There's a coupling of the test code to the 'graph.adjacency_list'
-      # dependency that could be costly down the line
-      expect(knight_graph.graph.adjacency_list).to_not be_empty
+      expect(knight_graph.adjacency_list).to_not be_empty
     end
-  end
-end
-
-RSpec.describe ChessPiece::KnightMoves do
-  def create_knight_moves
-    knight_graph = ChessPiece::KnightGraph.new(graph: Graph.new,
-                                   board: ChessBoard.new.board)
-
-    knight_graph.populate_graph
-
-    knight_moves = ChessPiece::KnightMoves.new(graph: knight_graph.graph)
   end
 
   describe "#reachable?" do
-    let(:knight) { create_knight_moves }
+    let(:knight) { create_knight }
 
     context "when input is invalid" do
       let(:valid_input) { "a1" }
@@ -78,8 +65,6 @@ RSpec.describe ChessPiece::KnightMoves do
         start_square = "a1"
         end_square = "c2" 
 
-        knight = create_knight_moves
-
         move = knight.reachable?(from: start_square, to: end_square)
 
         expect(move).to eq true
@@ -89,8 +74,6 @@ RSpec.describe ChessPiece::KnightMoves do
         start_square = "a1"
         end_square = "c4" 
 
-        knight = create_knight_moves
-
         move = knight.reachable?(from: start_square, to: end_square)
 
         expect(move).to eq false
@@ -99,13 +82,12 @@ RSpec.describe ChessPiece::KnightMoves do
   end
 
   describe "#next_moves" do
-    let(:knight) { create_knight_moves }
+    let(:knight) { create_knight }
 
     context "when input is invalid" do
       it "returns nil" do
-        moves = knight.next_moves(from: "z1")
-
-        expect(moves).to be_nil
+        expect{ knight.next_moves(from: :key) }
+          .to raise_error(StandardError, "Vertex not present")
       end
     end
 
