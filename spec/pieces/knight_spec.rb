@@ -25,25 +25,22 @@ RSpec.describe ChessPiece::Knight do
     board
   end
 
-  def create_knight
-    knight = described_class.new
-    knight.populate_graph(board: create_2d_board)
-
-    knight
-  end
-
   describe "#populate_graph" do
     it "fills the graph" do
-      knight_graph = create_knight
+      knight = described_class.new
 
-      knight_graph.populate_graph(board: create_2d_board)
+      knight.populate_graph(board: create_2d_board)
 
-      expect(knight_graph.adjacency_list).to_not be_empty
+      expect(knight.adjacency_list).to_not be_empty
     end
   end
 
   describe "#reachable?" do
-    let(:knight) { create_knight }
+    let(:knight) { described_class.new }
+
+    before do
+      knight.populate_graph(board: create_2d_board)
+    end
 
     context "when input is invalid" do
       let(:valid_input) { "a1" }
@@ -82,7 +79,11 @@ RSpec.describe ChessPiece::Knight do
   end
 
   describe "#next_moves" do
-    let(:knight) { create_knight }
+    let(:knight) { described_class.new }
+
+    before do
+      knight.populate_graph(board: create_2d_board)
+    end
 
     context "when input is invalid" do
       it "returns nil" do
