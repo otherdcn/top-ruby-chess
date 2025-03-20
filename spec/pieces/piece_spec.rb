@@ -63,8 +63,8 @@ RSpec.shared_examples 'can check squares reachability' do |test_input|
     end
 
     context "when input is valid" do
-      it "returns true from 'd4' to ...(range of elements from a test array)" do
-        start_square = "d4"
+      it "returns true from 'a1' to ...(range of elements from a test array)" do
+        start_square = "a1"
         end_squares = test_input[start_square]
 
         results = end_squares.map do |end_square|
@@ -74,8 +74,8 @@ RSpec.shared_examples 'can check squares reachability' do |test_input|
         expect(results).to all( be true )
       end
 
-      it "returns true from 'a1' to ...(range of elements from a test array)" do
-        start_square = "a1"
+      it "returns true from 'd4' to ...(range of elements from a test array)" do
+        start_square = "d4"
         end_squares = test_input[start_square]
 
         results = end_squares.map do |end_square|
@@ -132,7 +132,7 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
         expect(moves).to eq results
       end
 
-      it "returns array for 'd41'" do
+      it "returns array for 'd4'" do
         square = "d4"
         moves = piece.next_moves(from: square)
         results = test_input[square]
