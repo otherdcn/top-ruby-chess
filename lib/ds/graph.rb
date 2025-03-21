@@ -60,7 +60,6 @@ module Graph
     return nil if vertices_connected?(source, target)
 
     adjacency_list[source][:edges].append(target)
-    adjacency_list[target][:edges].append(source)
   end
 
   def vertices_connected?(source, target)
