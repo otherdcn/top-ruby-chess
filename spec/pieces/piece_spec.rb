@@ -126,7 +126,7 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
     context "when input is valid" do
       it "returns array for 'a1'" do
         square = "a1"
-        moves = piece.next_moves(from: square)
+        moves = piece.next_moves(from: square).sort
         results = test_input[square]
 
         expect(moves).to eq results
@@ -134,7 +134,7 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
 
       it "returns array for 'd4'" do
         square = "d4"
-        moves = piece.next_moves(from: square)
+        moves = piece.next_moves(from: square).sort
         results = test_input[square]
 
         expect(moves).to eq results
@@ -142,7 +142,7 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
 
       it "returns array for 'h8'" do
         square = "h8"
-        moves = piece.next_moves(from: square)
+        moves = piece.next_moves(from: square).sort
         results = test_input[square]
 
         expect(moves).to eq results

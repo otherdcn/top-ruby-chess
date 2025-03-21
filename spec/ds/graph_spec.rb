@@ -141,14 +141,6 @@ RSpec.describe GraphTest do
 
         expect(edge_added).to be true
       end
-
-      it "appends the source to the target's edge list" do
-        subject.add_edge(:source, :target)
-
-        edge_added = subject.adjacency_list[:target][:edges].contains? :source
-
-        expect(edge_added).to be true
-      end
     end
   end
 

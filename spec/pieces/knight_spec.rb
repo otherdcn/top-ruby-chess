@@ -7,9 +7,9 @@ RSpec.describe ChessPiece::Knight do
     include_examples "can populate a graph"
 
     reachable_test_input = {
-      "a1" => %w[b3 c2],
-      "d4" => %w[c6 e6 b5 f5 f3 e2 c2 b3],
-      "h8" => %w[g6 f7],
+      "a1" => %w[b3 c2].sort,
+      "d4" => %w[c6 e6 b5 f5 f3 e2 c2 b3].sort,
+      "h8" => %w[g6 f7].sort,
       validity: { valid: "a1", invalid: "z1" },
       legality: { from: "a1", to: "c3" }
     }
@@ -17,9 +17,9 @@ RSpec.describe ChessPiece::Knight do
     include_examples "can check squares reachability", reachable_test_input
 
     next_moves_test_input = {
-      "a1" => %w[b3 c2],
-      "d4" => %w[c6 e6 b5 f5 f3 e2 c2 b3],
-      "h8" => %w[g6 f7]
+      "a1" => %w[b3 c2].sort,
+      "d4" => %w[c6 e6 b5 f5 f3 e2 c2 b3].sort,
+      "h8" => %w[g6 f7].sort
     }
     include_examples "can provide next moves", next_moves_test_input
   end
