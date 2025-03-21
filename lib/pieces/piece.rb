@@ -31,7 +31,7 @@ module ChessPiece
       board.each_with_index do |row, row_idx|
         row.each_with_index do |col, col_idx|
           square_id = col
-          square_coord = [col_idx, row_idx]
+          square_coord = [row_idx, col_idx]
 
           add_square_to_board(square_id, square_coord)
         end
@@ -42,11 +42,12 @@ module ChessPiece
       board.each_with_index do |row, row_idx|
         row.each_with_index do |col, col_idx|
           square_id = col
-          square_coord = [col_idx, row_idx]
+          square_coord = [row_idx, col_idx]
+
           squares = generate_legal_squares(square_coord)
 
           squares.each do |target_coord|
-            target_file, target_rank = target_coord
+            target_rank, target_file = target_coord
 
             target_id = board[target_rank][target_file]
             add_square_to_movements(square_id, target_id)

@@ -34,16 +34,16 @@ module ChessPiece
 
     def shift_squares(position, shift_factor, current_square)
       if position == :file
-        file = current_square[0] + shift_factor
-        rank = current_square[1]
+        rank = current_square[0] + shift_factor
+        file = current_square[1]
       end
 
       if position == :rank
-        file = current_square[0]
-        rank = current_square[1] + shift_factor
+        rank = current_square[0]
+        file = current_square[1] + shift_factor
       end
 
-      [file, rank]
+      [rank, file]
     end
   end
 end

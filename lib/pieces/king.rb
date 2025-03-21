@@ -13,6 +13,8 @@ module ChessPiece
       down_left: [1, -1]
     }.freeze
 
+    private
+
     def generate_legal_squares(current_square)
       squares = []
 
@@ -28,10 +30,10 @@ module ChessPiece
     end
 
     def shift_squares(coord, current_square)
-      file = current_square[0] + coord[0]
-      rank = current_square[1] + coord[1]
+      rank = current_square[0] + coord[0]
+      file = current_square[1] + coord[1]
 
-      [file, rank]
+      [rank, file]
     end
   end
 end
