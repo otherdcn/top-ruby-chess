@@ -4,6 +4,8 @@ require_relative "./piece_spec.rb"
 
 RSpec.describe ChessPiece::King do
   context 'Base class methods' do
+    let(:piece) { described_class.new }
+
     include_examples "can populate a graph"
 
     reachable_test_input = {

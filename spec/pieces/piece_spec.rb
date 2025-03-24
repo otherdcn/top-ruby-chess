@@ -39,8 +39,6 @@ end
 
 RSpec.shared_examples 'can check squares reachability' do |test_input|
   describe "#reachable?" do
-    let(:piece) { described_class.new }
-
     before do
       piece.populate_graph(board: create_2d_board)
     end
@@ -67,33 +65,51 @@ RSpec.shared_examples 'can check squares reachability' do |test_input|
         start_square = "a1"
         end_squares = test_input[start_square]
 
-        results = end_squares.map do |end_square|
-          piece.reachable?(from: start_square, to: end_square)
+        if end_squares.nil?
+          truthy_result = true
+        else
+          results = end_squares.map do |end_square|
+            piece.reachable?(from: start_square, to: end_square)
+          end
+
+          truthy_result = results.all? true
         end
 
-        expect(results).to all( be true )
+        expect(truthy_result).to be true
       end
 
       it "returns true from 'd4' to ...(range of elements from a test array)" do
         start_square = "d4"
         end_squares = test_input[start_square]
 
-        results = end_squares.map do |end_square|
-          piece.reachable?(from: start_square, to: end_square)
+        if end_squares.nil?
+          truthy_result = true
+        else
+          results = end_squares.map do |end_square|
+            piece.reachable?(from: start_square, to: end_square)
+          end
+
+          truthy_result = results.all? true
         end
 
-        expect(results).to all( be true )
+        expect(truthy_result).to be true
       end
 
       it "returns true from 'h8' to ...(range of elements from a test array)" do
         start_square = "h8"
         end_squares = test_input[start_square]
 
-        results = end_squares.map do |end_square|
-          piece.reachable?(from: start_square, to: end_square)
+        if end_squares.nil?
+          truthy_result = true
+        else
+          results = end_squares.map do |end_square|
+            piece.reachable?(from: start_square, to: end_square)
+          end
+
+          truthy_result = results.all? true
         end
 
-        expect(results).to all( be true )
+        expect(truthy_result).to be true
       end
 
       it "returns false if illegal" do
@@ -110,8 +126,6 @@ end
 
 RSpec.shared_examples 'can provide next moves' do |test_input|
   describe "#next_moves" do
-    let(:piece) { described_class.new }
-
     before do
       piece.populate_graph(board: create_2d_board)
     end
@@ -126,7 +140,8 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
     context "when input is valid" do
       it "returns array for 'a1'" do
         square = "a1"
-        moves = piece.next_moves(from: square).sort
+        moves = piece.next_moves(from: square)
+        moves = moves.nil? ? moves : moves.sort
         results = test_input[square]
 
         expect(moves).to eq results
@@ -134,7 +149,8 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
 
       it "returns array for 'd4'" do
         square = "d4"
-        moves = piece.next_moves(from: square).sort
+        moves = piece.next_moves(from: square)
+        moves = moves.nil? ? moves : moves.sort
         results = test_input[square]
 
         expect(moves).to eq results
@@ -142,7 +158,8 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
 
       it "returns array for 'h8'" do
         square = "h8"
-        moves = piece.next_moves(from: square).sort
+        moves = piece.next_moves(from: square)
+        moves = moves.nil? ? moves : moves.sort
         results = test_input[square]
 
         expect(moves).to eq results

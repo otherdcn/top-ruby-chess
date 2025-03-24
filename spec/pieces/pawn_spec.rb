@@ -3,19 +3,39 @@ require_relative "../../lib/pieces/piece"
 require_relative "./piece_spec.rb"
 
 RSpec.describe ChessPiece::Pawn do
-  xcontext 'Base class methods' do
+  context 'Base class methods' do
     include_examples "can populate a graph"
 
-    test_input = {
-      "a1" => %w[a2 b2 b1].sort,
-      "d4" => %w[c5 d5 e5 c4 d3 e4 c3 e3].sort,
-      "h8" => %w[g8 h7 g7].sort,
-      validity: { valid: "a1", invalid: "z1" },
-      legality: { from: "a1", to: "c3" }
-    }
+    context "when pawn is white" do
+      let(:piece) { described_class.new(colour: 'white') }
 
-    include_examples "can check squares reachability", test_input
+      test_input = {
+        "a1" => %w[a2 a3 b2].sort,
+        "d4" => %w[d5 d6 c5 e5].sort,
+        "h8" => nil,
+        validity: { valid: "a1", invalid: "z1" },
+        legality: { from: "a1", to: "c3" }
+      }
 
-    include_examples "can provide next moves", test_input
+      include_examples "can check squares reachability", test_input
+
+      include_examples "can provide next moves", test_input
+    end
+
+    context "when pawn is black" do
+      let(:piece) { described_class.new(colour: 'black') }
+
+      test_input = {
+        "a1" => nil,
+        "d4" => %w[d3 d2 e3 c3].sort,
+        "h8" => %w[h7 h6 g7].sort,
+        validity: { valid: "a7", invalid: "z7" },
+        legality: { from: "a7", to: "c5" }
+      }
+
+      include_examples "can check squares reachability", test_input
+
+      include_examples "can provide next moves", test_input
+    end
   end
 end
