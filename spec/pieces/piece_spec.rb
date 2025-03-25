@@ -167,3 +167,18 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
     end
   end
 end
+
+RSpec.shared_examples 'can return name' do |test_input|
+  describe "#name" do
+    context "when no argument is given" do
+      it "returns a short concatenated string of type and colour" do
+        expect(piece.name).to eq test_input[:short_format_name]
+      end
+    end
+    context "when an argument is given" do
+      it "returns a long concatenated string of type and colour" do
+        expect(piece.name(long_format: true)).to eq test_input[:long_format_name]
+      end
+    end
+  end
+end

@@ -7,7 +7,7 @@ RSpec.describe ChessPiece::Pawn do
     include_examples "can populate a graph"
 
     context "when pawn is white" do
-      let(:piece) { described_class.new(colour: 'white') }
+      let(:piece) { described_class.new(colour: 'White') }
 
       test_input = {
         "a1" => %w[a2 a3 b2].sort,
@@ -20,10 +20,17 @@ RSpec.describe ChessPiece::Pawn do
       include_examples "can check squares reachability", test_input
 
       include_examples "can provide next moves", test_input
+
+      names = {
+        short_format_name: "PW",
+        long_format_name: "Pawn White"
+      }
+
+      include_examples 'can return name', names
     end
 
     context "when pawn is black" do
-      let(:piece) { described_class.new(colour: 'black') }
+      let(:piece) { described_class.new(colour: 'Black') }
 
       test_input = {
         "a1" => nil,
@@ -36,6 +43,13 @@ RSpec.describe ChessPiece::Pawn do
       include_examples "can check squares reachability", test_input
 
       include_examples "can provide next moves", test_input
+
+      names = {
+        short_format_name: "PB",
+        long_format_name: "Pawn Black"
+      }
+
+      include_examples 'can return name', names
     end
   end
 end

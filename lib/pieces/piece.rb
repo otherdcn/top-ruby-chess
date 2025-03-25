@@ -6,6 +6,20 @@ module ChessPiece
   class Piece
     include Graph
 
+    attr_reader :colour, :type
+
+    def initialize(colour: 'white', type:)
+      @colour = colour
+      @type = type
+    end
+
+    def name(long_format: false)
+      return "#{type} #{colour}" if long_format
+      return "#{type[1].upcase}#{colour[0]}" if type == "Knight"
+
+      "#{type[0]}#{colour[0]}"
+    end
+
     def reachable?(from:, to:)
       raise ChessPiece::Error, "Start square #{from} " \
       "not present" unless graph_of_moves(from)

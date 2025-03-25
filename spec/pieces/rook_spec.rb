@@ -24,5 +24,12 @@ RSpec.describe ChessPiece::Rook do
       "h8" => %w[a8 b8 c8 d8 e8 f8 g8 h7 h6 h5 h4 h3 h2 h1].sort
     }
     include_examples "can provide next moves", next_moves_test_input
+
+    names = {
+      short_format_name: "RW",
+      long_format_name: "Rook White"
+    }
+
+    include_examples 'can return name', names
   end
 end

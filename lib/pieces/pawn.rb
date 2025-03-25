@@ -9,16 +9,14 @@ module ChessPiece
       up_right: [-1, 1]
     }.freeze
 
-    attr_reader :colour
-
-    def initialize(colour: 'white')
-      @colour = colour
+    def initialize(colour: 'White', type: 'Pawn')
+      super(colour: colour, type: type)
     end
 
     private
     
     def reverse_movements
-      colour == "white" ? false : true
+      colour == "White" ? false : true
     end
 
     def generate_legal_squares(current_square)

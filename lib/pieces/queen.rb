@@ -13,6 +13,10 @@ module ChessPiece
       down_left: [1, -1]
     }.freeze
 
+    def initialize(colour: 'White', type: 'Queen')
+      super(colour: colour, type: type)
+    end
+
     private
 
     def generate_legal_squares(current_square)
