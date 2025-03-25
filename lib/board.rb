@@ -30,7 +30,7 @@ class ChessBoard
   def display
     board.each do |row|
       row.each do |column|
-        print "[#{column} - #{data[column]}]"
+        print "[#{column} - #{chess_piece_name(data[column])}]"
       end
 
       puts
@@ -53,5 +53,11 @@ class ChessBoard
     raise StandardError, "No such square (#{square_id}) present" if data[square_id].nil?
 
     @data[square_id] = ""
+  end
+
+  private
+
+  def chess_piece_name(obj)
+    obj.respond_to?(:name) ? obj.name : ""
   end
 end
