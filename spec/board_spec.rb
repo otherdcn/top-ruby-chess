@@ -77,4 +77,8 @@ RSpec.describe ChessBoard do
       it { expect { subject.remove_from_square(valid_square_id) }.to change { subject.data[valid_square_id] }.from("knight_white").to("") }
     end
   end
+
+  describe "#fill_rows" do
+    # Batch process of #add_to_square
+  end
 end
