@@ -10,14 +10,12 @@ end
 
 class Human < Player
   def initialize(name = "Human Hugh", colour = "white")
-    super
+    super(name, colour)
   end
 end
 
 class Computer < Player
-  attr_reader :name
-
   def initialize(name = "Computer Carl", colour = "black")
-    super
+    super(name, colour)
   end
 end
