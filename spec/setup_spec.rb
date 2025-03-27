@@ -14,32 +14,66 @@ RSpec.describe Chess::Setup do
   describe ".create_palyers" do
     let(:subject) { described_class }
 
-    before do
-      allow(subject).to receive(:puts).once
-      allow(subject).to receive(:print).twice
-      allow(subject).to receive(:gets).and_return("Joe", "Jabe")
-    end
+    context "when 'mode' input is invalid" do
+      before do
+        invalid_1   = 's'
+        invalid_2   = '5'
+        valid       = '1'
+        allow(subject).to receive(:gets)
+          .and_return(invalid_1, invalid_2, valid)
+        allow(subject).to receive(:print)
+          .with("First (white pieces) player's screen name: ")
+        allow(subject).to receive(:print)
+          .with("Second (black pieces) player's screen name: ")
+      end
 
-    it "returns an array" do
-      expect(subject.create_palyers).to be_an(Array)
-    end
+      it "calls 'puts' 5 times and 'print' 3 times" do
+        expect(subject).to receive(:puts)
+          .at_least(5).times
+        expect(subject).to receive(:print)
+          .with("Select number [1 or 2]: ")
+          .exactly(3).times
 
-    it "returns instances of Player class" do
-      expect(subject.create_palyers).to all( be_a(Player) )
-    end
-
-    context "when no argument is given" do
-      it "returns two instances of Human classes" do
-        expect(subject.create_palyers).to all( be_a(Human) )
+        subject.create_palyers
       end
     end
 
-    context "when an argument is given" do
-      it "returns two instance of Human and Computer classes" do
-        players = subject.create_palyers(mode: 2)
+    context "when 'mode' input is valid" do
+      before do
+        allow(subject).to receive(:puts).at_least(4).times
+        allow(subject).to receive(:print).exactly(3).times
+        allow(subject).to receive(:gets).and_return('1', "Joe", "Jabe")
+      end
 
-        expect(players).to include(a_kind_of(Human))
-        expect(players).to include(a_kind_of(Computer))
+      it "returns an array" do
+        expect(subject.create_palyers).to be_an(Array)
+      end
+
+      it "returns instances of Player class" do
+        expect(subject.create_palyers).to all( be_a(Player) )
+      end
+
+      context "when mode is 1" do
+        before do
+          allow(subject).to receive(:gets).and_return('1', "Joe", "Jabe")
+        end
+
+        it "returns two instances of Human classes" do
+          expect(subject.create_palyers).to all( be_a(Human) )
+        end
+      end
+
+      context "when mode is 2" do
+        before do
+          allow(subject).to receive(:gets).and_return('2', "Joe", "Jabe")
+        end
+
+        it "returns two instance of Human and Computer classes" do
+          players = subject.create_palyers
+
+          expect(players).to include(a_kind_of(Human))
+          expect(players).to include(a_kind_of(Computer))
+        end
       end
     end
   end

@@ -9,7 +9,19 @@ module Chess
         ChessBoard.new
       end
 
-      def create_palyers(mode: 1)
+      def create_palyers
+        puts "Would you like to play:"
+        puts "1. Human vs Human"
+        puts "2. Human vs Computer"
+
+        input_validity = false
+
+        until input_validity
+          print "Select number [1 or 2]: "
+          mode = gets.chomp.strip.to_i
+          input_validity = validate_mode_input(mode)
+        end
+
         return create_human_vs_human if mode == 1
 
         create_human_vs_computer
@@ -39,6 +51,12 @@ module Chess
       end
 
       private
+
+      def validate_mode_input(input)
+        return true if input.between?(1, 2)
+
+        puts "Wrong input; please type 1 or 2; try again"
+      end
 
       def chess_board_grid
         create_chess_board.board
