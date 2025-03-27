@@ -30,7 +30,7 @@ class ChessBoard
   def display
     board.each do |row|
       row.each do |column|
-        print "[#{column} - #{chess_piece_name(data[column])}]"
+        print "[ #{column} - #{chess_piece_name(data[column])} ]"
       end
 
       puts
@@ -77,7 +77,7 @@ class ChessBoard
   private
 
   def chess_piece_name(obj)
-    obj.respond_to?(:name) ? obj.name : ""
+    obj.respond_to?(:name) ? obj.name : "".ljust(2)
   end
 
   def colour_of_pieces(pieces)
