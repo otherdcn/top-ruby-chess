@@ -67,11 +67,11 @@ module Chess
 
         print "First (white pieces) player's screen name: "
         player_1_name = gets.chomp
-        player_white = Human.new(player_1_name, "white")
+        player_white = Human.new(player_1_name, "White")
 
         print "Second (black pieces) player's screen name: "
         player_2_name = gets.chomp
-        player_black = Human.new(player_2_name, "black")
+        player_black = Human.new(player_2_name, "Black")
 
         [player_white, player_black]
       end
