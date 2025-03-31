@@ -42,5 +42,9 @@ module ChessPiece
 
       [rank, file]
     end
+
+    def get_moves
+      MOVES
+    end
   end
 end

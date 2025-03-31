@@ -1,5 +1,6 @@
 require_relative "../../lib/pieces/pawn"
 require_relative "../../lib/pieces/piece"
+require_relative "../../lib/board"
 require_relative "./piece_spec.rb"
 
 RSpec.describe ChessPiece::Pawn do
@@ -8,6 +9,7 @@ RSpec.describe ChessPiece::Pawn do
 
     context "when pawn is white" do
       let(:piece) { described_class.new(colour: 'White') }
+      let(:chess_board) { ChessBoard.new }
 
       test_input = {
         "a1" => %w[a2 a3 b2].sort,
@@ -31,6 +33,7 @@ RSpec.describe ChessPiece::Pawn do
 
     context "when pawn is black" do
       let(:piece) { described_class.new(colour: 'Black') }
+      let(:chess_board) { ChessBoard.new }
 
       test_input = {
         "a1" => nil,

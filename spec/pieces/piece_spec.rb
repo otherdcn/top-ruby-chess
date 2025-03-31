@@ -48,13 +48,17 @@ RSpec.shared_examples 'can check squares reachability' do |test_input|
       let(:invalid_input) { test_input[:validity][:invalid] }
 
       it "raises error for 'from' argument" do
-        expect { piece.reachable?(from: invalid_input, to: valid_input) }
+        expect { piece.reachable?(from: invalid_input,
+                                  to: valid_input,
+                                  chess_board: chess_board) }
           .to raise_error(ChessPiece::Error,
                           "Start square #{invalid_input} not present")
       end
 
       it "raises error for 'to' argument" do
-        expect { piece.reachable?(from: valid_input, to: invalid_input) }
+        expect { piece.reachable?(from: valid_input,
+                                  to: invalid_input,
+                                  chess_board: chess_board) }
           .to raise_error(ChessPiece::Error,
                           "Destination square #{invalid_input} not present")
       end
@@ -69,7 +73,9 @@ RSpec.shared_examples 'can check squares reachability' do |test_input|
           truthy_result = true
         else
           results = end_squares.map do |end_square|
-            piece.reachable?(from: start_square, to: end_square)
+            piece.reachable?(from: start_square,
+                             to: end_square,
+                             chess_board: chess_board)
           end
 
           truthy_result = results.all? true
@@ -86,7 +92,9 @@ RSpec.shared_examples 'can check squares reachability' do |test_input|
           truthy_result = true
         else
           results = end_squares.map do |end_square|
-            piece.reachable?(from: start_square, to: end_square)
+            piece.reachable?(from: start_square,
+                             to: end_square,
+                             chess_board: chess_board)
           end
 
           truthy_result = results.all? true
@@ -103,7 +111,9 @@ RSpec.shared_examples 'can check squares reachability' do |test_input|
           truthy_result = true
         else
           results = end_squares.map do |end_square|
-            piece.reachable?(from: start_square, to: end_square)
+            piece.reachable?(from: start_square,
+                             to: end_square,
+                             chess_board: chess_board)
           end
 
           truthy_result = results.all? true
@@ -116,7 +126,9 @@ RSpec.shared_examples 'can check squares reachability' do |test_input|
         start_square = test_input[:legality][:from]
         end_square = test_input[:legality][:to]
 
-        move = piece.reachable?(from: start_square, to: end_square)
+        move = piece.reachable?(from: start_square,
+                                to: end_square,
+                                chess_board: chess_board)
 
         expect(move).to eq false
       end
@@ -132,7 +144,7 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
 
     context "when input is invalid" do
       it "raises an error" do
-        expect{ piece.next_moves(from: :key) }
+        expect{ piece.next_moves(from: :key, chess_board: chess_board) }
           .to raise_error(StandardError, "Vertex not present")
       end
     end
@@ -140,7 +152,7 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
     context "when input is valid" do
       it "returns array for 'a1'" do
         square = "a1"
-        moves = piece.next_moves(from: square)
+        moves = piece.next_moves(from: square, chess_board: chess_board)
         moves = moves.nil? ? moves : moves.sort
         results = test_input[square]
 
@@ -149,7 +161,7 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
 
       it "returns array for 'd4'" do
         square = "d4"
-        moves = piece.next_moves(from: square)
+        moves = piece.next_moves(from: square, chess_board: chess_board)
         moves = moves.nil? ? moves : moves.sort
         results = test_input[square]
 
@@ -158,7 +170,7 @@ RSpec.shared_examples 'can provide next moves' do |test_input|
 
       it "returns array for 'h8'" do
         square = "h8"
-        moves = piece.next_moves(from: square)
+        moves = piece.next_moves(from: square, chess_board: chess_board)
         moves = moves.nil? ? moves : moves.sort
         results = test_input[square]
 

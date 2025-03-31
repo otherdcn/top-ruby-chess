@@ -29,7 +29,6 @@ module ChessPiece
 
           if within_boundary?(new_square)
             squares << new_square
-            #next
           else
             break
           end
@@ -44,6 +43,10 @@ module ChessPiece
       file = current_square[1] + coord[1]
 
       [rank, file]
+    end
+
+    def get_moves
+      MOVES
     end
   end
 end

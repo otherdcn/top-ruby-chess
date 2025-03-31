@@ -1,10 +1,12 @@
 require_relative "../../lib/pieces/knight"
 require_relative "../../lib/pieces/piece"
+require_relative "../../lib/board"
 require_relative "./piece_spec.rb"
 
 RSpec.describe ChessPiece::Knight do
   context 'Base class methods' do
     let(:piece) { described_class.new }
+    let(:chess_board) { ChessBoard.new }
 
     include_examples "can populate a graph"
 

@@ -20,18 +20,41 @@ module ChessPiece
       "#{type[0]}#{colour[0]}"
     end
 
-    def reachable?(from:, to:)
+    def reachable?(from:, to:, chess_board:)
       raise ChessPiece::Error, "Start square #{from} " \
       "not present" unless graph_of_moves(from)
 
       raise ChessPiece::Error, "Destination square #{to} " \
       "not present" unless graph_of_moves(to)
 
-      squares_connected?(from, to)
+      next_moves(from: from, chess_board: chess_board).include?(to)
     end
 
-    def next_moves(from:)
-      immediate_squares(from)
+    def next_moves(from:, chess_board: nil)
+      next_squares = immediate_squares(from)
+
+      groups = next_squares.group_by do |next_square|
+        square_group(from, next_square, chess_board.board)
+      end
+
+      legal_squares = []
+
+      groups.each do |direction, squares|
+        squares.each do |square|
+          piece = chess_board.check_square(square)
+
+          if piece == ""
+            legal_squares << square
+          elsif piece.colour == colour
+            break
+          else
+            legal_squares << square
+            break
+          end
+        end
+      end
+
+      legal_squares
     end
 
     def populate_graph(board:)
@@ -92,6 +115,53 @@ module ChessPiece
 
     def add_square_to_movements(square_id, target_id)
       add_edge(square_id, target_id)
+    end
+
+    def square_group(square_id, next_square, board)
+      directions = generate_moves_squares(square_id, board)
+
+      directions.each do |direction, coords|
+        return direction if coords.include? next_square
+      end
+    end
+
+    def generate_moves_squares(square_id, board)
+      directions_hash = {}
+
+      current_square = find_in_2d_array(board, square_id)
+      moves = get_moves
+
+      moves.each do |directions, coord|
+        squares = []
+
+        (1..7).each do |shift_factor|
+          new_coord = coord.map { |ele| ele * shift_factor }
+          new_square = shift_squares(new_coord, current_square)
+
+          if within_boundary?(new_square)
+            squares << board[new_square[0]][new_square[1]]
+          else
+            break
+          end
+        end
+        directions_hash[directions] = squares
+      end
+
+      directions_hash
+    end
+
+    def find_in_2d_array(array, element)
+      row = nil
+      col = nil
+
+      array.each_with_index do |row_of_ele, row_idx|
+        row = row_idx
+
+        col = row_of_ele.find_index(element)
+        break if col
+      end
+
+      [row, col]
     end
   end
 end
