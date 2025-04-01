@@ -47,7 +47,11 @@ module ChessPiece
     end
 
     def get_moves
-      MOVES
+      if reverse_movements
+        moves = MOVES.transform_values { |value| value.map { |x| x * -1 } }
+      else
+        moves = MOVES
+      end
     end
   end
 end
