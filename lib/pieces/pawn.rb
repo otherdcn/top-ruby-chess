@@ -78,11 +78,6 @@ module ChessPiece
         moves = MOVES
         rank_idx = 6
       end
-      
-      two_up_square = add_two_square_advancement(moves[:_2_up],
-                      current_square) if row_idx == rank_idx
-
-      squares << two_up_square unless two_up_square.nil?
 
       moves.each do |direction, coord|
         next if direction == :_2_up
@@ -93,6 +88,11 @@ module ChessPiece
 
         squares << new_square
       end
+
+      two_up_square = add_two_square_advancement(moves[:_2_up],
+                      current_square) if row_idx == rank_idx
+
+      squares << two_up_square unless two_up_square.nil?
 
       squares
     end
