@@ -90,9 +90,9 @@ module Chess
 
       capture_empty_square(from, to, start_piece)
       
-      file = from.split.first
+      file = from.split("").first
 
-      return "x#{file}#{to}" if start_piece.instance_of? ChessPiece::Pawn
+      return "#{file}x#{to}" if start_piece.instance_of? ChessPiece::Pawn
 
       "#{start_piece.name}x#{to}"
     end
