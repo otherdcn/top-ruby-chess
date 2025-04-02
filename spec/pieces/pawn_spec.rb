@@ -12,8 +12,8 @@ RSpec.describe ChessPiece::Pawn do
       let(:chess_board) { ChessBoard.new }
 
       test_input = {
-        "a1" => %w[a2 b2].sort,
-        "d4" => %w[d5 c5 e5].sort,
+        "a1" => %w[a2].sort,
+        "d4" => %w[d5].sort,
         "h8" => nil,
         validity: { valid: "a1", invalid: "z1" },
         legality: { from: "a1", to: "c3" }
@@ -37,8 +37,8 @@ RSpec.describe ChessPiece::Pawn do
 
       test_input = {
         "a1" => nil,
-        "d4" => %w[d3 e3 c3].sort,
-        "h8" => %w[h7 g7].sort,
+        "d4" => %w[d3].sort,
+        "h8" => %w[h7].sort,
         validity: { valid: "a7", invalid: "z7" },
         legality: { from: "a7", to: "c5" }
       }

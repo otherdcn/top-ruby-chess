@@ -13,6 +13,37 @@ module ChessPiece
       super(colour: colour, type: type)
     end
 
+    def next_moves(from:, chess_board: nil)
+      next_squares = immediate_squares(from)
+
+      groups = next_squares.group_by do |next_square|
+        square_group(from, next_square, chess_board.board)
+      end
+
+      legal_squares = []
+
+      groups.each do |direction, squares|
+        squares.each do |square|
+          piece = chess_board.check_square(square)
+
+
+          if piece == "" && diagonal_movement(direction)
+            break
+          elsif piece == ""
+            legal_squares << square
+          elsif opponent_on_diagonal?(piece, direction)
+            legal_squares << square
+          elsif different_colour(piece)
+            break
+          elsif !different_colour(piece)
+            break
+          end
+        end
+      end
+
+      legal_squares
+    end
+
     private
     
     def reverse_movements
@@ -87,6 +118,21 @@ module ChessPiece
       else
         moves = MOVES
       end
+    end
+
+    def opponent_on_diagonal?(piece, direction)
+      opponent = different_colour(piece)
+      on_diagonal = diagonal_movement(direction)
+
+      opponent && on_diagonal
+    end
+
+    def different_colour(piece)
+      piece.colour != colour
+    end
+
+    def diagonal_movement(direction)
+      [:up_left, :up_right].include?(direction)
     end
   end
 end
