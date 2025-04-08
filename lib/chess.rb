@@ -2,16 +2,18 @@ module Chess
   class ChessGameError < StandardError; end
 
   class Game
-    attr_reader :chess_board, :captured_pieces_whites, :captured_pieces_blacks
+    attr_reader :chess_board, :captured_pieces_whites, :captured_pieces_blacks, :chess_moves
     attr_accessor :player
 
-    def initialize(chess_board:, players:)
+    def initialize(chess_board:, chess_moves:)
       @chess_board            = chess_board
 
       @captured_pieces_whites = []
       @captured_pieces_blacks = []
 
       @player                 = nil
+
+      @chess_moves           = chess_moves
     end
 
     def display
@@ -31,6 +33,14 @@ module Chess
         .join(" ")
         .colorize(color: :yellow)
       puts
+    end
+
+    def play(from:, to:)
+      en_passant_response = en_passant(from, to)
+
+      return en_passant_response unless en_passant_response.nil?
+
+      move_piece(from: from, to: to)
     end
 
     def move_piece(from:, to:)
@@ -70,6 +80,81 @@ module Chess
 
     private
 
+    def en_passant(from, to)
+      start_piece = chess_board.check_square(from)
+      adjacent_squares = check_pawn_adjacent_files(from)
+
+      if to.split("").first.succ == from.split("").first
+        square = adjacent_squares[:left_square]
+        adjacent_file_piece = square.nil? ? nil : chess_board.check_square(square)
+      else
+        square = adjacent_squares[:right_square]
+        adjacent_file_piece = square.nil? ? nil : chess_board.check_square(square)
+      end
+
+      return nil unless both_are_pawns?(start_piece, adjacent_file_piece)
+      return nil unless last_move?(adjacent_file_piece)
+
+      remove_piece(square, adjacent_file_piece)
+      capture_empty_square(from, to, start_piece, true)
+    end
+
+    def check_pawn_adjacent_files(square)
+      file, rank = square.split("")
+
+      left_file = (file.ord - 1).chr
+      right_file = (file.ord + 1).chr
+
+      left_square = valid_file?(left_file) ? left_file + rank : nil
+      right_square = valid_file?(right_file) ? right_file + rank : nil
+
+      {left_square: left_square, right_square: right_square}
+    end
+
+    def valid_file?(file)
+      file.between?("a","h")
+    end
+
+    def both_are_pawns?(start_piece, end_piece)
+      return false if end_piece.nil?
+
+      same_type = start_piece.instance_of?(ChessPiece::Pawn) &&
+        end_piece.instance_of?(ChessPiece::Pawn)
+
+      different_colour = end_piece_is_not_friendly?(start_piece,
+                                                    end_piece)
+
+      same_type && different_colour
+    end
+
+    def last_move?(piece)
+      last_move_made = chess_moves.last_move_made
+      start_square = last_move_made[:from]
+      end_square = last_move_made[:to]
+      piece_colour = last_move_made[:piece_name].split("").last
+
+      double_forward = double_forward_movement(start_square,
+                                               end_square,
+                                               piece_colour)
+
+      same_object = last_move_made[:object_id] == piece.object_id
+
+      double_forward && same_object
+    end
+
+    def same_object_move(recorded_object_id, piece_id)
+      recorded_object_id == piece_id
+    end
+
+    def double_forward_movement(start_square, end_square, colour)
+      start_row = start_square.split("").last.to_i
+      end_row = end_square.split("").last.to_i
+
+      return start_row.pred.pred == end_row if colour == "B"
+
+      start_row.next.next == end_row
+    end
+
     def start_piece_belongs_to_player?(piece)
       piece.colour == player.colour
     end
@@ -85,25 +170,35 @@ module Chess
     end
 
     def capture_opponent_square(from, to, start_piece, end_piece)
-      chess_board.remove_from_square(to)
-      captured_pieces_whites << end_piece
+      remove_piece(to, end_piece)
 
-      capture_empty_square(from, to, start_piece)
-      
-      file = from.split("").first
-
-      return "#{file}x#{to}" if start_piece.instance_of? ChessPiece::Pawn
-
-      "#{start_piece.name}x#{to}"
+      capture_empty_square(from, to, start_piece, true)
     end
 
-    def capture_empty_square(from, to, piece)
+    def remove_piece(to, end_piece)
+      chess_board.remove_from_square(to)
+      captured_pieces_whites << end_piece
+    end
+
+    def add_piece(from, to, piece)
       chess_board.remove_from_square(from)
       chess_board.add_to_square(to, piece)
+    end
 
-      return "#{to}" if piece.instance_of? ChessPiece::Pawn
+    def capture_empty_square(from, to, piece, captured_opponent = false, special_moves = {}, end_of_game = {})
+      add_piece(from, to, piece)
+      piece_is_pawn = piece.instance_of? ChessPiece::Pawn
 
-      "#{piece.name}#{to}"
+      move = chess_moves.record_move(object_id: piece.object_id,
+                                     piece_name: piece.name,
+                                     from: from,
+                                     to: to)
+
+      chess_moves.notation_message(move: move,
+                                   pawn: piece_is_pawn,
+                                   capture: captured_opponent,
+                                   special_moves: special_moves,
+                                   end_of_game: end_of_game)
     end
   end
 end
