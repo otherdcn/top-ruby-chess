@@ -1,4 +1,4 @@
-require_relative "../../lib/ds/queue"
+require_relative "../../../lib/ds/queue"
 
 RSpec.describe Queue do
   describe "#empty?" do

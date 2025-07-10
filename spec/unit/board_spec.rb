@@ -1,4 +1,4 @@
-require_relative "../lib/board"
+require_relative "../../lib/board"
 
 RSpec.describe ChessBoard do
   describe "#create_board" do

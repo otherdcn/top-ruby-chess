@@ -4,10 +4,15 @@ module ChessPiece
   class Pawn < Piece
     MOVES = {
       up: [-1, 0],
-      _2_up: [-2, 0],
       up_left: [-1, -1],
       up_right: [-1, 1]
     }.freeze
+
+    SPECIAL_MOVES = {
+      _2_up: [-2, 0],
+      en_passant_left: [0, -1],
+      en_passant_right: [0, 1]
+    }
 
     def initialize(colour: 'White', type: 'Pawn')
       super(colour: colour, type: type)
@@ -73,15 +78,18 @@ module ChessPiece
 
       if reverse_movements
         moves = MOVES.transform_values { |value| value.map { |x| x * -1 } }
+        special_moves = SPECIAL_MOVES.transform_values { |value|
+          value.map { |x| x * -1 } }
+
         rank_idx = 1
       else
         moves = MOVES
+        special_moves = SPECIAL_MOVES
+
         rank_idx = 6
       end
 
       moves.each do |direction, coord|
-        next if direction == :_2_up
-
         new_square = shift_squares(coord, current_square)
 
         next unless within_boundary?(new_square)
@@ -89,7 +97,7 @@ module ChessPiece
         squares << new_square
       end
 
-      two_up_square = add_two_square_advancement(moves[:_2_up],
+      two_up_square = add_two_square_advancement(special_moves[:_2_up],
                       current_square) if row_idx == rank_idx
 
       squares << two_up_square unless two_up_square.nil?

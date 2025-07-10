@@ -1,5 +1,5 @@
-require_relative "../../lib/pieces/piece"
-require_relative "../../lib/ds/graph"
+require_relative "../../../lib/pieces/piece"
+require_relative "../../../lib/ds/graph"
 
 def create_2d_board
   column_files = "a".upto("h").map(&:to_s)

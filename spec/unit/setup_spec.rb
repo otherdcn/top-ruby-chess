@@ -1,4 +1,4 @@
-require_relative "../lib/setup"
+require_relative "../../lib/setup"
 
 RSpec.describe Chess::Setup do
   describe ".create_chess_board" do

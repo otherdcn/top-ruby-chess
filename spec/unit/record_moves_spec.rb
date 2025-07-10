@@ -1,4 +1,4 @@
-require_relative "../lib/record_moves"
+require_relative "../../lib/record_moves"
 
 RSpec.describe Chess::RecordMoves do
   def record_move_helper(piece_name: "PW", from_par: "a2,", to_par: "a4")

@@ -1,6 +1,6 @@
-require_relative "../../lib/pieces/rook"
-require_relative "../../lib/pieces/piece"
-require_relative "../../lib/board"
+require_relative "../../../lib/pieces/rook"
+require_relative "../../../lib/pieces/piece"
+require_relative "../../../lib/board"
 require_relative "./piece_spec.rb"
 
 RSpec.describe ChessPiece::Rook do
