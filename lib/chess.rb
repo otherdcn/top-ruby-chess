@@ -2,14 +2,13 @@ module Chess
   class ChessGameError < StandardError; end
 
   class Game
-    attr_reader :chess_board, :captured_pieces_whites, :captured_pieces_blacks, :chess_moves
+    attr_reader :chess_board, :captured_pieces, :chess_moves
     attr_accessor :player
 
     def initialize(chess_board:, chess_moves:)
       @chess_board            = chess_board
 
-      @captured_pieces_whites = []
-      @captured_pieces_blacks = []
+      @captured_pieces = []
 
       @player                 = nil
 
@@ -29,7 +28,7 @@ module Chess
       puts
 
       print "Captured pieces -> "
-      print captured_pieces_whites.map {|e| e.name}
+      print captured_pieces.map {|e| e.name}
         .join(" ")
         .colorize(color: :yellow)
       puts
@@ -42,6 +41,8 @@ module Chess
 
       move_piece(from: from, to: to)
     end
+
+    private
 
     def move_piece(from:, to:)
       start_piece = chess_board.check_square(from)
@@ -78,8 +79,6 @@ module Chess
       piece.next_moves(from: square, chess_board: chess_board).join(", ")
     end
 
-    private
-
     def en_passant(from, to)
       start_piece = chess_board.check_square(from)
       adjacent_squares = check_pawn_adjacent_files(from)
@@ -96,7 +95,7 @@ module Chess
       return nil unless last_move?(adjacent_file_piece)
 
       remove_piece(square, adjacent_file_piece)
-      capture_empty_square(from, to, start_piece, true)
+      capture_empty_square(from, to, start_piece, true, special_moves = {en_passant: true})
     end
 
     def check_pawn_adjacent_files(square)
@@ -177,7 +176,7 @@ module Chess
 
     def remove_piece(to, end_piece)
       chess_board.remove_from_square(to)
-      captured_pieces_whites << end_piece
+      captured_pieces << end_piece
     end
 
     def add_piece(from, to, piece)
