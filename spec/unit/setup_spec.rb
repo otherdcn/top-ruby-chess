@@ -159,4 +159,33 @@ RSpec.describe Chess::Setup do
                                   black: black_chess_pieces)
     end
   end
+
+  describe ".promote_pawn" do
+    let(:subject) { Chess::Setup }
+
+    before do
+      allow(subject).to receive(:puts)#.exactly(4).times
+      allow(subject).to receive(:print).once
+    end
+
+    it "returns Queen chess piece when user inputs 1" do
+      allow(subject).to receive(:gets).and_return("1")
+      expect(subject.promote_pawn).to be_instance_of(ChessPiece::Queen)
+    end
+
+    it "returns Rook chess piece when user inputs 2" do
+      allow(subject).to receive(:gets).and_return("2")
+      expect(subject.promote_pawn).to be_instance_of(ChessPiece::Rook)
+    end
+
+    it "returns Bishop chess piece when user inputs 3" do
+      allow(subject).to receive(:gets).and_return("3")
+      expect(subject.promote_pawn).to be_instance_of(ChessPiece::Bishop)
+    end
+
+    it "returns Knight chess piece when user inputs 4" do
+      allow(subject).to receive(:gets).and_return("4")
+      expect(subject.promote_pawn).to be_instance_of(ChessPiece::Knight)
+    end
+  end
 end

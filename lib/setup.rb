@@ -50,6 +50,20 @@ module Chess
         chess_board.fill_rows(pieces: black)
       end
 
+      def promote_pawn(player_colour: "White")
+        promotable_pieces = %w[Queen Rook Bishop Knight]
+
+        puts "\nYour Pawn Piece has reached its last rank"
+        puts "Replace with one of the following pieces:"
+        promotable_pieces.each_with_index { |piece, idx| puts "#{idx + 1}> #{piece}" }
+        print "Select 1-4: "
+        user_input = gets.chomp.to_i - 1
+
+        puts "You chose #{user_input + 1} -> #{promotable_pieces[user_input]}\n"
+
+        get_class_const(promotable_pieces[user_input], player_colour)
+      end
+
       private
 
       def validate_mode_input(input)
@@ -103,6 +117,14 @@ module Chess
         return all_chess_pieces.first if quantity == 1
 
         all_chess_pieces
+      end
+
+      def get_class_const(klass_str, player_colour)
+        klass = ChessPiece.const_get(klass_str)
+        klass_obj = klass.new(colour: player_colour)
+        klass_obj.populate_graph(board: chess_board_grid)
+
+        klass_obj
       end
     end
   end
