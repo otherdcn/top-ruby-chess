@@ -14,13 +14,7 @@ module Chess
         puts "1. Human vs Human"
         puts "2. Human vs Computer"
 
-        input_validity = false
-
-        until input_validity
-          print "Select number [1 or 2]: "
-          mode = gets.chomp.strip.to_i
-          input_validity = validate_mode_input(mode)
-        end
+        mode = get_user_input(1..2)
 
         return create_human_vs_human if mode == 1
 
@@ -56,20 +50,30 @@ module Chess
         puts "\nYour Pawn Piece has reached its last rank"
         puts "Replace with one of the following pieces:"
         promotable_pieces.each_with_index { |piece, idx| puts "#{idx + 1}> #{piece}" }
-        print "Select 1-4: "
-        user_input = gets.chomp.to_i - 1
+        user_input = get_user_input(0..3, -1)
 
-        puts "You chose #{user_input + 1} -> #{promotable_pieces[user_input]}\n"
+        puts "Replacing with #{promotable_pieces[user_input]}\n"
 
         get_class_const(promotable_pieces[user_input], player_colour)
       end
 
       private
 
-      def validate_mode_input(input)
-        return true if input.between?(1, 2)
+      def get_user_input(range, offset = 0)
+        input_validity = false
 
-        puts "Wrong input; please type 1 or 2; try again"
+        until input_validity
+          print "Select number [#{range}]: "
+          input = gets.chomp.strip.to_i + offset
+          validate_input(input, range) ? input_validity = true : puts("Wrong input;"\
+            " please type between #{range}; try again")
+        end
+
+        input
+      end
+
+      def validate_input(input, range = 1..2)
+        return true if range.cover? input
       end
 
       def chess_board_grid

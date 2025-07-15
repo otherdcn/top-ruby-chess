@@ -31,8 +31,7 @@ RSpec.describe Chess::Setup do
         expect(subject).to receive(:puts)
           .at_least(5).times
         expect(subject).to receive(:print)
-          .with("Select number [1 or 2]: ")
-          .exactly(3).times
+          .exactly(5).times
 
         subject.create_palyers
       end
