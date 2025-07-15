@@ -152,9 +152,12 @@ module Chess
             chess_game.play(from: "a4", to: "a5")
             chess_game.player = player_black
             chess_game.play(from: "b7", to: "b5")
-
             chess_game.player = player_white
-            expect(chess_game.play(from: "a5", to: "b6")).to eq "axb6 e.p."
+            notation_message = chess_game.play(from: "a5", to: "b6")
+
+            expect(notation_message).to eq "axb6 e.p."
+            expect(chess_game.captured_pieces.last.name).to eq "PB"
+            expect(chess_game.check_board_square(square: "b6")).to eq "PW"
           end
         end
 

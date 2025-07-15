@@ -35,10 +35,6 @@ module Chess
     end
 
     def play(from:, to:)
-      en_passant_response = en_passant(from, to)
-
-      return en_passant_response unless en_passant_response.nil?
-
       move_piece(from: from, to: to)
     end
 
@@ -58,11 +54,14 @@ module Chess
         "#{player.name}" unless start_piece_belongs_to_player?(start_piece)
       raise ChessGameError, "#{start_piece.name} cannot capture "\
         "#{end_piece.name}" unless end_piece_is_not_friendly?(start_piece, end_piece)
+
+      return en_passant(from, to) if en_passant_possible?(start_piece, from, to)
+
       raise ChessGameError, "#{start_piece.name} cannot move from "\
         "#{from} to #{to}" unless start_piece_can_complete_move?(start_piece, from, to)
 
       return promotion(start_piece, end_piece,
-                       from, to) if pawn_at_last_rank?(start_piece, to)
+                       from, to) if promotion_possible?(start_piece, to)
 
       capture(start_piece, end_piece, from, to, {})
     end
@@ -84,8 +83,7 @@ module Chess
       piece.next_moves(from: square, chess_board: chess_board).join(", ")
     end
 
-    def en_passant(from, to)
-      start_piece = chess_board.check_square(from)
+    def en_passant_possible?(start_piece, from, to)
       adjacent_squares = check_pawn_adjacent_files(from)
 
       if to.split("").first.succ == from.split("").first
@@ -96,14 +94,25 @@ module Chess
         adjacent_file_piece = square.nil? ? nil : chess_board.check_square(square)
       end
 
-      return nil unless both_are_pawns?(start_piece, adjacent_file_piece)
-      return nil unless last_move?(adjacent_file_piece)
+      @en_passant_attr = {
+        start_piece: start_piece,
+        adjacent_file_piece: adjacent_file_piece,
+        square: square
+      }
 
-      remove_piece(square, adjacent_file_piece)
-      capture_empty_square(from, to, start_piece, true, special_moves = {en_passant: true})
+      both_are_pawns?(start_piece, adjacent_file_piece) &&
+        last_move?(adjacent_file_piece)
     end
 
-    def pawn_at_last_rank?(start_piece, to)
+    def en_passant(from, to)
+      remove_piece(@en_passant_attr[:square],
+                   @en_passant_attr[:adjacent_file_piece])
+      capture_empty_square(from, to,
+                           @en_passant_attr[:start_piece],
+                           true, {en_passant: true})
+    end
+
+    def promotion_possible?(start_piece, to)
       rank = to.split("").last
       final_rank = rank.to_i == 1 || rank.to_i == 8
       pawn_piece = start_piece.instance_of? ChessPiece::Pawn
