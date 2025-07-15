@@ -50,7 +50,7 @@ module Chess
         puts "\nYour Pawn Piece has reached its last rank"
         puts "Replace with one of the following pieces:"
         promotable_pieces.each_with_index { |piece, idx| puts "#{idx + 1}> #{piece}" }
-        user_input = get_user_input(0..3, -1)
+        user_input = (get_user_input(1..4) - 1) # subtract by 1 for zero-based index
 
         puts "Replacing with #{promotable_pieces[user_input]}\n"
 
@@ -59,12 +59,12 @@ module Chess
 
       private
 
-      def get_user_input(range, offset = 0)
+      def get_user_input(range)
         input_validity = false
 
         until input_validity
           print "Select number [#{range}]: "
-          input = gets.chomp.strip.to_i + offset
+          input = gets.chomp.strip.to_i
           validate_input(input, range) ? input_validity = true : puts("Wrong input;"\
             " please type between #{range}; try again")
         end
