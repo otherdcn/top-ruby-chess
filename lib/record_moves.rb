@@ -28,14 +28,21 @@ module Chess
       captured = capture ? "x" : ""
       to = move[:to]
 
-      return en_passant_message(file, captured, to) if special_moves.key? :en_passant
-      return promotion_message(to, special_moves[:promotion]) if special_moves.key? :promotion
-      return castling_message(special_moves[:castling]) if special_moves.key? :castling
+      return en_passant_message(file, captured, to) if special_moves
+        .key? :en_passant
+      return promotion_message(to, special_moves[:promotion]) if special_moves
+        .key? :promotion
+      return castling_message(special_moves[:castling]) if special_moves
+        .key? :castling
 
-      return check_message(piece_notation, file, captured, to) if end_of_game.key? :check
-      return checkmate_message(piece_notation, file, captured, to) if end_of_game.key? :checkmate
-      return win_message(end_of_game[:winner]) if end_of_game.key? :winner
-      return draw_message if end_of_game.key? :draw
+      return check_message(piece_notation, file, captured, to) if end_of_game
+        .key? :check
+      return checkmate_message(piece_notation, file, captured, to) if end_of_game
+        .key? :checkmate
+      return win_message(end_of_game[:winner]) if end_of_game
+        .key? :winner
+      return draw_message if end_of_game
+        .key? :draw
 
       # regular move -> capture empty square or capture opponent
       new_message = "#{piece_notation}#{file}#{captured}#{to}"
