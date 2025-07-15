@@ -179,6 +179,39 @@ module Chess
           end
         end
       end
+
+      context "promotion" do
+        let(:setup_double) { Chess::Setup }
+
+        it "switches piece from pawn to new selected piece" do
+          chess_game.player = player_white
+          chess_game.play(from: "a2", to: "a4")
+          chess_game.player = player_black
+          chess_game.play(from: "b7", to: "b5")
+          chess_game.player = player_white
+          chess_game.play(from: "a4", to: "b5")
+          chess_game.player = player_black
+          chess_game.play(from: "b8", to: "c6")
+          chess_game.player = player_white
+          chess_game.play(from: "b5", to: "b6")
+          chess_game.player = player_black
+          chess_game.play(from: "c6", to: "e5")
+          chess_game.player = player_white
+          chess_game.play(from: "b6", to: "b7")
+          chess_game.player = player_black
+          chess_game.play(from: "e5", to: "f3")
+
+          allow(setup_double).to receive(:gets).and_return('1')
+
+          chess_game.player = player_white
+
+          promotion_message   = chess_game.play(from: "b7", to: "b8")
+          promoted_piece      = chess_game.check_board_square(square: "b8")
+
+          expect(promotion_message).to eq("b8=QW")
+          expect(promoted_piece).to include("QW")
+        end
+      end
     end
   end
 end

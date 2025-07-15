@@ -42,6 +42,12 @@ module Chess
       move_piece(from: from, to: to)
     end
 
+    def check_board_square(square:)
+      object = chess_board.check_square(square)
+
+      return object.name if object.is_a? ChessPiece::Piece
+    end
+
     private
 
     def move_piece(from:, to:)
@@ -55,19 +61,18 @@ module Chess
       raise ChessGameError, "#{start_piece.name} cannot move from "\
         "#{from} to #{to}" unless start_piece_can_complete_move?(start_piece, from, to)
 
-      if end_piece == ""
-        capture_empty_square(from, to, start_piece)
-      else
-        capture_opponent_square(from, to, start_piece, end_piece)
-      end
+      return promotion(start_piece, end_piece,
+                       from, to) if pawn_at_last_rank?(start_piece, to)
+
+      capture(start_piece, end_piece, from, to, {})
     end
 
-    def check_board_square(square:)
-      object = chess_board.check_square(square)
-
-      return "Square #{square} contains: #{object.name}" if object.is_a? ChessPiece::Piece
-
-      "Square #{square} is empty"
+    def capture(start_piece, end_piece, from, to, special_moves)
+      if end_piece == ""
+        capture_empty_square(from, to, start_piece, false, special_moves)
+      else
+        capture_opponent_square(from, to, start_piece, end_piece, special_moves)
+      end
     end
 
     def check_piece_next_moves(square:)
@@ -96,6 +101,24 @@ module Chess
 
       remove_piece(square, adjacent_file_piece)
       capture_empty_square(from, to, start_piece, true, special_moves = {en_passant: true})
+    end
+
+    def pawn_at_last_rank?(start_piece, to)
+      rank = to.split("").last
+      final_rank = rank.to_i == 1 || rank.to_i == 8
+      pawn_piece = start_piece.instance_of? ChessPiece::Pawn
+
+      final_rank && pawn_piece
+    end
+
+    def promotion(start_piece, end_piece, from, to)
+      replacement_piece = Chess::Setup.promote_pawn(player_colour: player.colour)
+
+      notation_message = capture(start_piece, end_piece, from, to,
+                                 { promotion: replacement_piece.name })
+
+      add_piece(to, to, replacement_piece)
+      notation_message
     end
 
     def check_pawn_adjacent_files(square)
@@ -168,10 +191,10 @@ module Chess
       start_piece.reachable?(from: from, to: to, chess_board: chess_board)
     end
 
-    def capture_opponent_square(from, to, start_piece, end_piece)
+    def capture_opponent_square(from, to, start_piece, end_piece, special_moves = {})
       remove_piece(to, end_piece)
 
-      capture_empty_square(from, to, start_piece, true)
+      capture_empty_square(from, to, start_piece, true, special_moves)
     end
 
     def remove_piece(to, end_piece)
