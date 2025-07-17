@@ -217,6 +217,43 @@ module Chess
       end
 
       context "castling" do
+        context "if certain conditions are not met" do
+          it "raises error if either king or rook has already moved" do
+            chess_game.player = player_white
+            chess_game.play(from: "g2", to: "g4")
+            chess_game.play(from: "f1", to: "h3")
+            chess_game.play(from: "g1", to: "f3")
+            chess_game.play(from: "e1", to: "f1")
+            chess_game.play(from: "f1", to: "e1")
+
+            expect { chess_game.play(from: "e1", to: "g1") }
+              .to raise_error(ChessGameError, "King or Rook has already moved")
+          end
+
+          it "raises error if there are pieces between king and rook" do
+            chess_game.player = player_white
+            chess_game.play(from: "g1", to: "f3")
+
+            expect { chess_game.play(from: "e1", to: "g1") }
+              .to raise_error(ChessGameError, "There are pieces between King and Rook")
+          end
+
+          it "raises error if king is currently in check" do
+            pending "not yet implemented"
+            chess_game.player = player_white
+
+            expect { chess_game.play(from: "e1", to: "g1") }
+              .to raise_error(ChessGameError, "King is currently in check")
+          end
+
+          it "raises error if king pass through or finish on a square that is attacked" do
+            pending "not yet implemented"
+            chess_game.player = player_white
+            expect { chess_game.play(from: "e1", to: "g1") }
+              .to raise_error(ChessGameError, "King will pass through or end on attacked square")
+          end
+        end
+
         context "if kingside" do
           context "and for white player" do
             it "moves both pieces and records it `0-0`" do
