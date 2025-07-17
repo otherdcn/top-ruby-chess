@@ -184,7 +184,7 @@ module Chess
       end
 
       context "promotion" do
-        let(:setup_double) { Chess::Setup }
+        let(:setup_promotion) { Chess::Setup }
 
         it "switches piece from pawn to new selected piece" do
           chess_game.player = player_white
@@ -204,7 +204,7 @@ module Chess
           chess_game.player = player_black
           chess_game.play(from: "e5", to: "f3")
 
-          allow(setup_double).to receive(:gets).and_return('1')
+          allow(setup_promotion).to receive(:gets).and_return('1')
 
           chess_game.player = player_white
 
@@ -213,6 +213,86 @@ module Chess
 
           expect(promotion_message).to eq("b8=QW")
           expect(promoted_piece).to include("QW")
+        end
+      end
+
+      context "castling" do
+        context "if kingside" do
+          context "and for white player" do
+            it "moves both pieces and records it `0-0`" do
+              chess_game.player = player_white
+              chess_game.play(from: "g2", to: "g4")
+              chess_game.play(from: "f1", to: "h3")
+              chess_game.play(from: "g1", to: "f3")
+
+              notation_message = chess_game.play(from: "e1", to: "g1")
+              at_square_g1 = chess_game.check_board_square(square: 'g1')
+              at_square_f1 = chess_game.check_board_square(square: 'f1')
+
+              expect(notation_message).to eq "0-0"
+              expect(at_square_g1).to eq "KW"
+              expect(at_square_f1).to eq "RW"
+            end
+          end
+
+          context "and for black player" do
+            it "moves both pieces and records it `0-0`" do
+              chess_game.player = player_black
+              chess_game.play(from: "g7", to: "g5")
+              chess_game.play(from: "f8", to: "h6")
+              chess_game.play(from: "g8", to: "f6")
+
+              notation_message = chess_game.play(from: "e8", to: "g8")
+              at_square_g8 = chess_game.check_board_square(square: 'g8')
+              at_square_f8 = chess_game.check_board_square(square: 'f8')
+
+              expect(notation_message).to eq "0-0"
+              expect(at_square_g8).to eq "KB"
+              expect(at_square_f8).to eq "RB"
+            end
+          end
+        end
+
+        context "if queenside" do
+          context "and for white player" do
+            it "moves both pieces and records it as `0-0-0`" do
+              chess_game.player = player_white
+              chess_game.play(from: "c2", to: "c4")
+              chess_game.play(from: "d2", to: "d4")
+              chess_game.play(from: "b1", to: "c3")
+              chess_game.play(from: "c1", to: "e3")
+              chess_game.play(from: "d1", to: "a4")
+
+              notation_message = chess_game.play(from: "e1", to: "c1")
+              at_square_c1 = chess_game.check_board_square(square: 'c1')
+              at_square_d1 = chess_game.check_board_square(square: 'd1')
+
+              expect(notation_message).to eq "0-0-0"
+              expect(at_square_c1).to eq "KW"
+              expect(at_square_d1).to eq "RW"
+            end
+          end
+
+          context "and for black player" do
+            it "moves both pieces and records it as `0-0-0`" do
+              chess_game.player = player_black
+              chess_game.play(from: "c7", to: "c5")
+              chess_game.play(from: "d7", to: "d5")
+              chess_game.play(from: "b8", to: "c6")
+              chess_game.play(from: "c8", to: "e6")
+              chess_game.play(from: "d8", to: "a5")
+              #chess_game.play(from: "e8", to: "d8")
+              #chess_game.play(from: "d8", to: "e8")
+
+              notation_message = chess_game.play(from: "e8", to: "c8")
+              at_square_c8 = chess_game.check_board_square(square: 'c8')
+              at_square_d8 = chess_game.check_board_square(square: 'd8')
+
+              expect(notation_message).to eq "0-0-0"
+              expect(at_square_c8).to eq "KB"
+              expect(at_square_d8).to eq "RB"
+            end
+          end
         end
       end
     end

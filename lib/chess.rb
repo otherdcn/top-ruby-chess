@@ -52,6 +52,10 @@ module Chess
 
       raise ChessGameError, "#{start_piece.name} does not belong to "\
         "#{player.name}" unless start_piece_belongs_to_player?(start_piece)
+
+      return castle(start_piece, from, to) if castling_possible?(start_piece,
+                                                                 from, to)
+
       raise ChessGameError, "#{start_piece.name} cannot capture "\
         "#{end_piece.name}" unless end_piece_is_not_friendly?(start_piece, end_piece)
 
@@ -128,6 +132,82 @@ module Chess
 
       add_piece(to, to, replacement_piece)
       notation_message
+    end
+
+    def castle(king_piece, from, to)
+      capture(@castling_attr[:rook],
+              "",
+              @castling_attr[:from],
+              @castling_attr[:to],
+              { ignore_rook_movement: true })
+      capture(king_piece,
+              "",
+              from,
+              to,
+              { castling: @castling_attr[:side] })
+    end
+
+    def castling_possible?(king_piece, from, to)
+      if from == "e1" && to == "c1"
+        add_to_castling_attr(chess_board.check_square("a1"), "a1", "d1", :queenside)
+      elsif from == "e8" && to == "c8"
+        add_to_castling_attr(chess_board.check_square("a8"), "a8", "d8", :queenside)
+      elsif from == "e1" && to == "g1"
+        add_to_castling_attr(chess_board.check_square("h1"), "h1", "f1", :kingside)
+      elsif from == "e8" && to == "g8"
+        add_to_castling_attr(chess_board.check_square("h8"), "h8", "f8", :kingside)
+      else
+        return false
+      end
+
+      return true if made_no_move_yet?(king_piece.object_id,
+                                       @castling_attr[:rook].object_id) &&
+      nothing_between_king_and_rook?(king_piece.name,
+                                     @castling_attr[:side]) &&
+      !is_check? &&
+      !moving_to_check?
+    end
+
+    def add_to_castling_attr(rook, from, to, side)
+      @castling_attr = { rook: rook, from: from, to: to, side: side }
+    end
+
+    def made_no_move_yet?(king_piece_id, rook_piece_id)
+      no_movement = chess_moves.all_moves_made.none? do |move|
+        move[:object_id] == king_piece_id || move[:object_id] == rook_piece_id
+      end
+
+      raise ChessGameError, "King or Rook has already moved" unless no_movement
+
+      no_movement
+    end
+
+    def nothing_between_king_and_rook?(name, side)
+      if side == :kingside && name.include?("W")
+        nothing_in_between = check_squares_by_king(%w[f1 g1])
+      elsif side == :kingside && name.include?("B")
+        nothing_in_between = check_squares_by_king(%w[f8 g8])
+      elsif side == :queenside && name.include?("W")
+        nothing_in_between = check_squares_by_king(%w[b1 c1 d1])
+      elsif side == :queenside && name.include?("B")
+        nothing_in_between = check_squares_by_king(%w[b8 c8 d8])
+      end
+
+      raise ChessGameError, "There are pieces between King and Rook" unless nothing_in_between
+
+      nothing_in_between
+    end
+
+    def check_squares_by_king(squares)
+      squares.map { |sq| chess_board.check_square(sq) }.all? { |sq| sq.empty? }
+    end
+
+    def is_check?
+      false
+    end
+
+    def moving_to_check?
+      false
     end
 
     def check_pawn_adjacent_files(square)
@@ -220,6 +300,7 @@ module Chess
       add_piece(from, to, piece)
       piece_is_pawn = piece.instance_of? ChessPiece::Pawn
 
+      return if special_moves[:ignore_rook_movement]
       move = chess_moves.record_move(object_id: piece.object_id,
                                      piece_name: piece.name,
                                      from: from,
