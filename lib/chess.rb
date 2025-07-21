@@ -134,19 +134,6 @@ module Chess
       notation_message
     end
 
-    def castle(king_piece, from, to)
-      capture(@castling_attr[:rook],
-              "",
-              @castling_attr[:from],
-              @castling_attr[:to],
-              { ignore_rook_movement: true })
-      capture(king_piece,
-              "",
-              from,
-              to,
-              { castling: @castling_attr[:side] })
-    end
-
     def castling_possible?(king_piece, from, to)
       if from == "e1" && to == "c1"
         add_to_castling_attr(chess_board.check_square("a1"), "a1", "d1", :queenside)
@@ -166,6 +153,19 @@ module Chess
                                      @castling_attr[:side]) &&
       !is_check? &&
       !moving_to_check?
+    end
+
+    def castle(king_piece, from, to)
+      capture(@castling_attr[:rook],
+              "",
+              @castling_attr[:from],
+              @castling_attr[:to],
+              { ignore_rook_movement: true })
+      capture(king_piece,
+              "",
+              from,
+              to,
+              { castling: @castling_attr[:side] })
     end
 
     def add_to_castling_attr(rook, from, to, side)
