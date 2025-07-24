@@ -202,7 +202,7 @@ module Chess
           chess_game.player = player_white
           chess_game.play(from: "b6", to: "b7")
           chess_game.player = player_black
-          chess_game.play(from: "e5", to: "f3")
+          chess_game.play(from: "e5", to: "g4")
 
           allow(setup_promotion).to receive(:gets).and_return('1')
 

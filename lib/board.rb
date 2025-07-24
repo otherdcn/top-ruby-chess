@@ -38,19 +38,22 @@ class ChessBoard
   end
 
   def check_square(square_id)
-    raise StandardError, "No such square (#{square_id}) present" if data[square_id].nil?
+    raise StandardError, "No such square (#{square_id})"\
+      " present" if data[square_id].nil?
 
     data[square_id]
   end
 
   def add_to_square(square_id, chess_piece)
-    raise StandardError, "No such square (#{square_id}) present" if data[square_id].nil?
+    raise StandardError, "No such square (#{square_id})"\
+      " present" if data[square_id].nil?
 
     @data[square_id] = chess_piece
   end
 
   def remove_from_square(square_id)
-    raise StandardError, "No such square (#{square_id}) present" if data[square_id].nil?
+    raise StandardError, "No such square (#{square_id})"\
+      " present" if data[square_id].nil?
 
     @data[square_id] = ""
   end
@@ -95,6 +98,10 @@ class ChessBoard
     square_with_pieces.keys
   end
 
+  def create_simulation_board
+    ChessBoardSimulation.new(data, board)
+  end
+
   private
 
   def chess_piece_name(obj)
@@ -125,4 +132,15 @@ class ChessBoard
     add_to_square(row[6], knights.last)
     add_to_square(row[7], rooks.last)
   end
+end
+
+class ChessBoardSimulation < ChessBoard
+  attr_reader :simulation
+
+  def initialize(data, board)
+    @data = data.clone
+    @board = board.clone
+  end
+
+  def simulation? = true
 end

@@ -6,6 +6,7 @@ module Chess
     attr_accessor :player
 
     def initialize(chess_board:, chess_moves:)
+      @original_board         = chess_board
       @chess_board            = chess_board
 
       @captured_pieces = []
@@ -33,7 +34,7 @@ module Chess
         .colorize(color: :yellow)
       puts
 
-      puts "\n#*** #{player.colour.upcase} KING IS IN CHECK ***".colorize(color: :yellow) if is_check?
+      puts "\n*** #{player.colour.upcase} KING IS IN CHECK ***".colorize(color: :yellow) if is_check?
     end
 
     def play(from:, to:)
@@ -49,9 +50,30 @@ module Chess
     private
 
     def move_piece(from:, to:)
+      if is_check?
+        check_removal_move(from, to)
+      else
+        normal_move(from, to)
+      end
+    end
+
+    def check_removal_move(from, to)
+      switch_chessboard(board: :simulation) # simulate board until no more check
+      normal_move(from, to)
+
+      raise ChessGameError, "#{player.colour.upcase} KING STILL"\
+        " IN CHECK" if is_check?
+
+      switch_chessboard(board: :original) # switch to original when no check
+      normal_move(from, to)
+    end
+
+    def normal_move(from, to)
       start_piece = chess_board.check_square(from)
       end_piece = chess_board.check_square(to)
 
+      raise ChessGameError, "#{from} is an empty square" unless start_piece
+        .respond_to? :name
       raise ChessGameError, "#{start_piece.name} does not belong to "\
         "#{player.name}" unless start_piece_belongs_to_player?(start_piece)
 
@@ -204,6 +226,18 @@ module Chess
       squares.map { |sq| chess_board.check_square(sq) }.all? { |sq| sq.empty? }
     end
 
+    def switch_chessboard(board: :original)
+      if board == :original
+        @chess_board = @original_board
+      elsif board == :simulation
+        @chess_board = set_simulation_board
+      end
+    end
+
+    def set_simulation_board
+      @original_board.create_simulation_board
+    end
+
     def is_check?
       current_player_king = player.colour == "White" ? "KW" : "KB"
       current_player_king_location = king_current_location(current_player_king)
@@ -319,7 +353,11 @@ module Chess
 
     def remove_piece(to, end_piece)
       chess_board.remove_from_square(to)
-      captured_pieces << end_piece
+      add_to_captured_pieces(end_piece)
+    end
+
+    def add_to_captured_pieces(piece)
+      captured_pieces << piece unless chess_board.respond_to? :simulation?
     end
 
     def add_piece(from, to, piece)
@@ -332,6 +370,8 @@ module Chess
       piece_is_pawn = piece.instance_of? ChessPiece::Pawn
 
       return if special_moves[:ignore_rook_movement]
+      return if chess_board.respond_to? :simulation?
+
       move = chess_moves.record_move(object_id: piece.object_id,
                                      piece_name: piece.name,
                                      from: from,
