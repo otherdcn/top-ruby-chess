@@ -32,6 +32,8 @@ module Chess
         .join(" ")
         .colorize(color: :yellow)
       puts
+
+      puts "\n#*** #{player.colour.upcase} KING IS IN CHECK ***".colorize(color: :yellow) if is_check?
     end
 
     def play(from:, to:)
@@ -203,11 +205,40 @@ module Chess
     end
 
     def is_check?
-      false
+      current_player_king = player.colour == "White" ? "KW" : "KB"
+      current_player_king_location = king_current_location(current_player_king)
+
+      opponents_colour = player.colour == "White" ? "Black" : "White"
+      check = opponents_next_moves(opponents_colour)
+        .include?(current_player_king_location)
+
+      return check
     end
 
     def moving_to_check?
       false
+    end
+
+    def king_current_location(piece_name)
+      first, second = chess_board.find_all_pieces_for_type(type: "King")
+
+      first_element_name = chess_board.check_square(first).name
+
+      return first.strip if first_element_name == piece_name
+
+      second.strip
+    end
+
+    def opponents_next_moves(colour)
+      opponents_positions = chess_board.find_all_pieces_for_colour(colour: colour)
+
+      all_moves = []
+      opponents_positions.each do |square|
+        all_moves << chess_board.check_square(square)
+          .next_moves(from: square, chess_board: chess_board).flatten
+      end
+
+      all_moves.flatten
     end
 
     def check_pawn_adjacent_files(square)

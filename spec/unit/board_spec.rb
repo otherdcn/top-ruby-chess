@@ -81,4 +81,63 @@ RSpec.describe ChessBoard do
   describe "#fill_rows" do
     # Batch process of #add_to_square
   end
+
+  describe "#find_all_pieces_for_*" do
+    subject { described_class.new }
+
+    context "when argument is colour" do
+      let(:white_chess_piece) { double("ChessPiece::Bishop",
+                                                colour: "White") }
+      let(:black_chess_piece) { double("ChessPiece::Bishop",
+                                                colour: "Black") }
+
+      before do
+        %w[a1 b1 c1].each do |square_id|
+          subject.data[square_id] = white_chess_piece
+        end
+        %w[a8 b8 c8].each do |square_id|
+          subject.data[square_id] = black_chess_piece
+        end
+      end
+
+      it "returns squares that contain white pieces" do
+        white_squares = subject.find_all_pieces_for_colour(colour: "White")
+        all_white_squares = white_squares.all? do |square|
+          subject.check_square(square).colour == "White"
+        end
+
+        expect(all_white_squares).to eq(true)
+        expect(white_squares.size).to eq 3
+      end
+
+      it "returns squares that contain black pieces" do
+        black_squares = subject.find_all_pieces_for_colour(colour: "Black")
+        all_black_squares = black_squares.all? do |square|
+          subject.check_square(square).colour == "Black"
+        end
+
+        expect(all_black_squares).to eq(true)
+        expect(black_squares.size).to eq 3
+      end
+    end
+
+    context "when argument is type" do
+      let(:white_chess_king) { double("ChessPiece::King",
+                                                name: "KW") }
+      let(:black_chess_king) { double("ChessPiece::King",
+                                                name: "BK") }
+
+      before do
+        subject.data["d1"] = white_chess_king
+        subject.data["d8"] = black_chess_king
+      end
+
+      it "returns square that contain king pieces (black and white)" do
+        king_squares = subject.find_all_pieces_for_type(type: "King")
+        all_king_squares = king_squares.all? do |square|
+          subject.check_square(square).type == "King"
+        end
+      end
+    end
+  end
 end

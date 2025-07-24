@@ -74,6 +74,27 @@ class ChessBoard
     end
   end
 
+  # Use 'method_missing' to combine 'find_all_pieces_for_*' methods
+  def find_all_pieces_for_colour(colour: "White")
+    square_with_pieces = data.select do |square_id, square_content|
+      next unless square_content.respond_to? :colour
+
+      square_content.colour == colour
+    end
+
+    square_with_pieces.keys
+  end
+
+  def find_all_pieces_for_type(type: "King")
+    square_with_pieces = data.select do |square_id, square_content|
+      next unless square_content.respond_to? :type
+
+      square_content.type == type
+    end
+
+    square_with_pieces.keys
+  end
+
   private
 
   def chess_piece_name(obj)
