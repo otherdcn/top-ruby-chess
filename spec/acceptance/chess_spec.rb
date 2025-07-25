@@ -239,11 +239,22 @@ module Chess
           end
 
           it "raises error if king is currently in check" do
-            pending "not yet implemented"
             chess_game.player = player_white
+            chess_game.play(from: "e2", to: "e4")
+            chess_game.player = player_black
+            chess_game.play(from: "e7", to: "e5")
+            chess_game.player = player_white
+            chess_game.play(from: "g1", to: "f3")
+            chess_game.player = player_black
+            chess_game.play(from: "d8", to: "h4")
+            chess_game.player = player_white
+            chess_game.play(from: "f1", to: "d3")
+            chess_game.player = player_black
+            chess_game.play(from: "h4", to: "f2")
 
+            chess_game.player = player_white
             expect { chess_game.play(from: "e1", to: "g1") }
-              .to raise_error(ChessGameError, "King is currently in check")
+              .to raise_error(ChessGameError, /KING STILL IN CHECK/)
           end
 
           it "raises error if king pass through or finish on a square that is attacked" do

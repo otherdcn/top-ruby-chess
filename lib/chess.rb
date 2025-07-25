@@ -159,6 +159,11 @@ module Chess
     end
 
     def castling_possible?(king_piece, from, to)
+      raise ChessGameError, "#{player.colour.upcase} KING STILL"\
+        " IN CHECK" if is_check?
+      raise ChessGameError, "#{player.colour.upcase} KING MOVING"\
+        " THROUGH CHECK" if moving_to_check?
+
       if from == "e1" && to == "c1"
         add_to_castling_attr(chess_board.check_square("a1"), "a1", "d1", :queenside)
       elsif from == "e8" && to == "c8"
@@ -174,9 +179,7 @@ module Chess
       return true if made_no_move_yet?(king_piece.object_id,
                                        @castling_attr[:rook].object_id) &&
       nothing_between_king_and_rook?(king_piece.name,
-                                     @castling_attr[:side]) &&
-      !is_check? &&
-      !moving_to_check?
+                                     @castling_attr[:side])
     end
 
     def castle(king_piece, from, to)
