@@ -159,27 +159,36 @@ module Chess
     end
 
     def castling_possible?(king_piece, from, to)
-      raise ChessGameError, "#{player.colour.upcase} KING STILL"\
-        " IN CHECK" if is_check?
-      raise ChessGameError, "#{player.colour.upcase} KING MOVING"\
-        " THROUGH CHECK" if moving_to_check?
-
       if from == "e1" && to == "c1"
-        add_to_castling_attr(chess_board.check_square("a1"), "a1", "d1", :queenside)
+        add_to_castling_attr(chess_board.check_square("a1"),
+                             "a1", "d1", :queenside)
       elsif from == "e8" && to == "c8"
-        add_to_castling_attr(chess_board.check_square("a8"), "a8", "d8", :queenside)
+        add_to_castling_attr(chess_board.check_square("a8"),
+                             "a8", "d8", :queenside)
       elsif from == "e1" && to == "g1"
-        add_to_castling_attr(chess_board.check_square("h1"), "h1", "f1", :kingside)
+        add_to_castling_attr(chess_board.check_square("h1"),
+                             "h1", "f1", :kingside)
       elsif from == "e8" && to == "g8"
-        add_to_castling_attr(chess_board.check_square("h8"), "h8", "f8", :kingside)
+        add_to_castling_attr(chess_board.check_square("h8"),
+                             "h8", "f8", :kingside)
       else
         return false
       end
 
-      return true if made_no_move_yet?(king_piece.object_id,
-                                       @castling_attr[:rook].object_id) &&
-      nothing_between_king_and_rook?(king_piece.name,
+      raise ChessGameError, "CANNOT CASTLE: #{player.colour.upcase} "\
+        "KING STILL IN CHECK" if is_check?
+      raise ChessGameError, "CANNOT CASTLE: #{player.colour.upcase} "\
+        "KING MOVING TO CHECK" if moving_to_check?(to, @castling_attr[:side])
+      raise ChessGameError, "CANNOT CASTLE: #{player.colour.upcase} "\
+        "KING MOVING THROUGH CHECK" if moving_through_check?(to,
+                                                             @castling_attr[:side])
+
+      no_movement = made_no_move_yet?(king_piece.object_id,
+                                       @castling_attr[:rook].object_id)
+      no_inbetween = nothing_between_king_and_rook?(king_piece.name,
                                      @castling_attr[:side])
+
+      return true if no_movement && no_inbetween
     end
 
     def castle(king_piece, from, to)
@@ -252,8 +261,52 @@ module Chess
       return check
     end
 
-    def moving_to_check?
-      false
+    def moving_to_check?(to, castling_side = nil)
+      current_player_king = player.colour == "White" ? "KW" : "KB"
+      current_player_king_location = king_current_location(current_player_king)
+
+      king_piece = chess_board.check_square(current_player_king_location)
+      king_piece_next_moves = king_piece
+        .next_moves(from: current_player_king_location,
+                    chess_board: chess_board)
+
+      if castling_side
+        king_piece_next_moves.push(castling_endpoint(player.colour,castling_side))
+      end
+
+      opponents_colour = player.colour == "White" ? "Black" : "White"
+      check = opponents_next_moves(opponents_colour).include?(to)
+
+      king_piece_next_moves.include?(to) && check
+    end
+
+    def moving_through_check?(to, castling_side = nil)
+      current_player_king = player.colour == "White" ? "KW" : "KB"
+      current_player_king_location = king_current_location(current_player_king)
+
+      king_piece = chess_board.check_square(current_player_king_location)
+      king_piece_next_moves = king_piece
+        .next_moves(from: current_player_king_location,
+                    chess_board: chess_board)
+
+      if castling_side
+        king_piece_next_moves.push(castling_endpoint(player.colour,castling_side))
+      end
+
+      opponents_colour = player.colour == "White" ? "Black" : "White"
+      all_opponents_next_moves = opponents_next_moves(opponents_colour)
+      check = (all_opponents_next_moves & king_piece_next_moves).any?
+
+      return king_piece_next_moves.include?(to) && check
+    end
+
+    def castling_endpoint(colour, side = :kingside)
+      end_points = {
+        "White" => { kingside: "g1", queenside: "c1" },
+        "Black" => { kingside: "g8", queenside: "c8" }
+      }
+
+      end_points[colour][side]
     end
 
     def king_current_location(piece_name)

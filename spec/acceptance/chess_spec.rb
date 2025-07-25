@@ -257,11 +257,46 @@ module Chess
               .to raise_error(ChessGameError, /KING STILL IN CHECK/)
           end
 
-          it "raises error if king pass through or finish on a square that is attacked" do
-            pending "not yet implemented"
+          it "raises error if king finishes on a square that is attacked" do
+            chess_game.player = player_white
+            chess_game.play(from: "e2", to: "e4")
+            chess_game.player = player_black
+            chess_game.play(from: "e7", to: "e5")
+            chess_game.player = player_white
+            chess_game.play(from: "g1", to: "f3")
+            chess_game.player = player_black
+            chess_game.play(from: "d8", to: "g5")
+            chess_game.player = player_white
+            chess_game.play(from: "f1", to: "d3")
+            chess_game.player = player_black
+            chess_game.play(from: "g5", to: "g2")
+
             chess_game.player = player_white
             expect { chess_game.play(from: "e1", to: "g1") }
-              .to raise_error(ChessGameError, "King will pass through or end on attacked square")
+              .to raise_error(ChessGameError, /KING MOVING TO CHECK/)
+          end
+
+          it "raises error if king passes through on a square that is attacked" do
+            chess_game.player = player_white
+            chess_game.play(from: "e2", to: "e4")
+            chess_game.player = player_black
+            chess_game.play(from: "e7", to: "e5")
+            chess_game.player = player_white
+            chess_game.play(from: "f1", to: "d3")
+            chess_game.player = player_black
+            chess_game.play(from: "d8", to: "f6")
+            chess_game.player = player_white
+            chess_game.play(from: "f2", to: "f4")
+            chess_game.player = player_black
+            chess_game.play(from: "f6", to: "f4")
+            chess_game.player = player_white
+            chess_game.play(from: "g1", to: "h3")
+            chess_game.player = player_black
+            chess_game.play(from: "a7", to: "a5")
+
+            chess_game.player = player_white
+            expect { chess_game.play(from: "e1", to: "g1") }
+              .to raise_error(ChessGameError, /KING MOVING THROUGH CHECK/)
           end
         end
 
