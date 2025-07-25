@@ -1,6 +1,7 @@
 require_relative "../../lib/chess"
 require_relative "../../lib/setup"
 require_relative "../../lib/record_moves"
+require 'colorize'
 
 module Chess
   RSpec.describe Chess do
@@ -376,6 +377,29 @@ module Chess
               expect(at_square_d8).to eq "RB"
             end
           end
+        end
+      end
+    end
+
+    describe "check and checkmate" do
+      context "#check" do
+        it "prints a notice indicating check in progress" do
+          chess_game.player = player_white
+          chess_game.play(from: "e2", to: "e4")
+          chess_game.player = player_black
+          chess_game.play(from: "e7", to: "e5")
+          chess_game.player = player_white
+          chess_game.play(from: "g1", to: "f3")
+          chess_game.player = player_black
+          chess_game.play(from: "d8", to: "h4")
+          chess_game.player = player_white
+          chess_game.play(from: "f1", to: "d3")
+          chess_game.player = player_black
+          chess_game.play(from: "h4", to: "f2")
+          chess_game.player = player_white
+
+          expect { chess_game.play(from: "a2", to: "a3") }
+            .to raise_error(ChessGameError,/KING STILL IN CHECK/)
         end
       end
     end
