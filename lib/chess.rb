@@ -47,6 +47,21 @@ module Chess
       return object.name if object.is_a? ChessPiece::Piece
     end
 
+    def end_game?
+      return false unless is_checkmate?
+
+      true
+    end
+
+    def announce_winner
+      winner = player.colour == "White" ? "Black" : "White"
+      loser = player.colour
+
+      puts "********** CHECKMATE against #{loser} **********\n"
+      puts "Game over, #{winner} Wins!\n"
+      puts "********** CHECKMATE against #{loser}**********\n"
+    end
+
     private
 
     def move_piece(from:, to:)
@@ -298,6 +313,21 @@ module Chess
       check = (all_opponents_next_moves & king_piece_next_moves).any?
 
       return king_piece_next_moves.include?(to) && check
+    end
+
+    def is_checkmate?
+      current_player_king = player.colour == "White" ? "KW" : "KB"
+      current_player_king_location = king_current_location(current_player_king)
+
+      king_piece = chess_board.check_square(current_player_king_location)
+      king_piece_next_moves_array = king_piece
+        .next_moves(from: current_player_king_location,
+                    chess_board: chess_board)
+
+      opponents_colour = player.colour == "White" ? "Black" : "White"
+      opponents_next_moves_array = opponents_next_moves(opponents_colour)
+
+      is_check? && (king_piece_next_moves_array - opponents_next_moves_array).empty?
     end
 
     def castling_endpoint(colour, side = :kingside)

@@ -402,6 +402,34 @@ module Chess
             .to raise_error(ChessGameError,/KING STILL IN CHECK/)
         end
       end
+
+      context "#checkmate" do
+        it "ends the game" do
+          chess_game.player = player_white
+          chess_game.play(from: "e2", to: "e3")
+          chess_game.player = player_black
+          chess_game.play(from: "e7", to: "e5")
+          chess_game.player = player_white
+          chess_game.play(from: "g1", to: "h3")
+          chess_game.player = player_black
+          chess_game.play(from: "d8", to: "h4")
+          chess_game.player = player_white
+          chess_game.play(from: "f2", to: "f4")
+          chess_game.player = player_black
+          chess_game.play(from: "b8", to: "c6")
+          chess_game.player = player_white
+          chess_game.play(from: "g2", to: "g3")
+          chess_game.player = player_black
+          chess_game.play(from: "c6", to: "d4")
+          chess_game.player = player_white
+          chess_game.play(from: "a2", to: "a3")
+          chess_game.player = player_black
+          chess_game.play(from: "h4", to: "g3")
+          chess_game.player = player_white
+
+          expect(chess_game.end_game?).to eq true
+        end
+      end
     end
   end
 end
