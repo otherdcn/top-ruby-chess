@@ -1,4 +1,4 @@
-# Title of Project
+# Project: Command Line Chess Game
 A short description of your project goes here.
 Following the [TOP (The Odin Project)](https://www.theodinproject.com/lessons/ruby-ruby-final-project) course and developing a command line Chess game where two players can play against each other.
 
