@@ -1,6 +1,6 @@
-require_relative "./player"
-require_relative "./board"
-require_relative "./pieces/all"
+require_relative "../player"
+require_relative "../board"
+require_relative "../pieces/all"
 
 module Chess
   class Setup
@@ -82,6 +82,7 @@ module Chess
 
       def create_human_vs_human
         puts "\nPlaying Human vs Human..."
+        puts
 
         print "First (white pieces) player's screen name: "
         player_1_name = gets.chomp
@@ -96,6 +97,7 @@ module Chess
 
       def create_human_vs_computer
         puts "\nPlaying Human vs Computer..."
+        puts
 
         print "Human (white pieces) player's screen name: "
         player_1_name = gets.chomp

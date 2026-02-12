@@ -1,5 +1,5 @@
 require_relative "../../lib/chess"
-require_relative "../../lib/setup"
+require_relative "../../lib/control_centre/setup"
 require_relative "../../lib/record_moves"
 require 'colorize'
 
