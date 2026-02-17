@@ -25,9 +25,11 @@ module Chess
       end
     end
 
-    def save; end
-
     private
+
+    def save
+      puts "** SAVING GAME **"
+    end
 
     def setup_new_game
       puts "\nSetting New Game..."
@@ -48,17 +50,31 @@ module Chess
 
     def setup_old_game; end
 
+    def command_input
+      puts "> Enter 'start' and 'end' square seperated by comma to move piece, e.g. a2,a4"
+      #puts "> Enter 's' to save and continue game, e.g. s"
+      puts "> Enter 'sq' to save and quit game, e.g. sq"
+      print "===> Your command: "
+      gets.chomp.split(",")
+    end
+
     def play(chess_game)
       all_moves = []
       round = 1
+      game_over = false
+      save_and_quit = false
 
-      loop do
+      until game_over || save_and_quit
         round_move = "#{round}. "
 
         [@player_white, @player_black].each do |player|
           chess_game.player = player
 
-          break if chess_game.end_game?
+          if chess_game.end_game?
+            chess_game.announce_winner
+            game_over = true
+            break
+          end
 
           chess_game.display
           puts
@@ -66,9 +82,17 @@ module Chess
 
           while repeat_turn
             begin
-              puts "(Select start and end square seperated by comma, e.g. a2,a4) "
-              print "Move piece: "
-              from, to = gets.chomp.split(",")
+              from, to = command_input
+
+              if from == "s"
+                save
+                raise ChessGameError, "Save complete. Continuing Game..."
+              elsif from == "sq"
+                save
+                save_and_quit = true
+                puts "\nQuitting Game...\n"
+                break
+              end
 
               raise ChessGameError, "Missing source square" if from.nil? || from.empty?
               raise ChessGameError, "Missing target square" if to.nil? || to.empty?
@@ -100,10 +124,9 @@ module Chess
             puts
           end
 
+          break if save_and_quit
           round_move += " "
         end
-
-        break if chess_game.end_game?
 
         round += 1
         all_moves << round_move
@@ -113,10 +136,7 @@ module Chess
         puts all_moves.join(" ").colorize(color: :yellow)
         puts "-----"
       end
-
-      chess_game.announce_winner
     end
   end
 end
 
-#Chess::Control.new.start
