@@ -6,7 +6,7 @@ class ChessBoard
 
   def initialize
     @board = []
-    @data = ({})
+    @data = {}
 
     create_board
   end
@@ -16,7 +16,7 @@ class ChessBoard
       row = []
 
       COLUMN_FILES.map do |file|
-        square_id = file+rank
+        square_id = file + rank
 
         row << square_id
         @data[square_id] = ""
@@ -38,31 +38,37 @@ class ChessBoard
   end
 
   def check_square(square_id)
-    raise StandardError, "No such square (#{square_id})"\
-      " present" if data[square_id].nil?
+    if data[square_id].nil?
+      raise StandardError, "No such square (#{square_id}) " \
+                           "present"
+    end
 
     data[square_id]
   end
 
   def add_to_square(square_id, chess_piece)
-    raise StandardError, "No such square (#{square_id})"\
-      " present" if data[square_id].nil?
+    if data[square_id].nil?
+      raise StandardError, "No such square (#{square_id}) " \
+                           "present"
+    end
 
     @data[square_id] = chess_piece
   end
 
   def remove_from_square(square_id)
-    raise StandardError, "No such square (#{square_id})"\
-      " present" if data[square_id].nil?
+    if data[square_id].nil?
+      raise StandardError, "No such square (#{square_id}) " \
+                           "present"
+    end
 
     @data[square_id] = ""
   end
 
   def fill_rows(pieces:, pawn_row: false)
-    rows_to_fill_up = { white: { for_pawns: 6, other: 7},
+    rows_to_fill_up = { white: { for_pawns: 6, other: 7 },
                         black: { for_pawns: 1, other: 0 } }
 
-    rows = if colour_of_pieces(pieces) == 'White'
+    rows = if colour_of_pieces(pieces) == "White"
              rows_to_fill_up[:white]
            else
              rows_to_fill_up[:black]
@@ -79,7 +85,7 @@ class ChessBoard
 
   # Use 'method_missing' to combine 'find_all_pieces_for_*' methods
   def find_all_pieces_for_colour(colour: "White")
-    square_with_pieces = data.select do |square_id, square_content|
+    square_with_pieces = data.select do |_square_id, square_content|
       next unless square_content.respond_to? :colour
 
       square_content.colour == colour
@@ -89,7 +95,7 @@ class ChessBoard
   end
 
   def find_all_pieces_for_type(type: "King")
-    square_with_pieces = data.select do |square_id, square_content|
+    square_with_pieces = data.select do |_square_id, square_content|
       next unless square_content.respond_to? :type
 
       square_content.type == type
@@ -121,7 +127,7 @@ class ChessBoard
   end
 
   def insert_other_pieces(row, pieces)
-    king, queen, bishops, knights, rooks, _ = pieces
+    king, queen, bishops, knights, rooks, = pieces
 
     add_to_square(row[0], rooks.first)
     add_to_square(row[1], knights.first)
@@ -142,5 +148,7 @@ class ChessBoardSimulation < ChessBoard
     @board = board.clone
   end
 
-  def simulation? = true
+  def simulation?
+    true
+  end
 end

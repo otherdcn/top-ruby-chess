@@ -1,7 +1,7 @@
-require_relative "./setup"
+require_relative "setup"
 require_relative "../chess"
 require_relative "../record_moves"
-require 'colorize'
+require "colorize"
 
 module Chess
   class ChessGameError < StandardError; end
@@ -19,7 +19,7 @@ module Chess
         play(setup_new_game)
       elsif game_option == 2
         puts "** NOT YET AVAILABLE **"
-        #play(setup_old_game)
+        # play(setup_old_game)
       else
         puts "Unknown option #{game_option}!"
       end
@@ -35,10 +35,10 @@ module Chess
       puts "\nSetting New Game..."
       puts
 
-      @player_white, @player_black  = Chess::Setup.create_palyers
+      @player_white, @player_black = Chess::Setup.create_palyers
       chess_board                 = Chess::Setup.create_chess_board
-      chess_pieces_white          = Chess::Setup.create_chess_pieces(colour: 'White')
-      chess_pieces_black          = Chess::Setup.create_chess_pieces(colour: 'Black')
+      chess_pieces_white          = Chess::Setup.create_chess_pieces(colour: "White")
+      chess_pieces_black          = Chess::Setup.create_chess_pieces(colour: "Black")
 
       Chess::Setup.arrange_chess_board(chess_board: chess_board,
                                        white: chess_pieces_white,
@@ -52,7 +52,7 @@ module Chess
 
     def command_input
       puts "> Enter 'start' and 'end' square seperated by comma to move piece, e.g. a2,a4"
-      #puts "> Enter 's' to save and continue game, e.g. s"
+      puts "> Enter 's' to save and continue game, e.g. s"
       puts "> Enter 'sq' to save and quit game, e.g. sq"
       print "===> Your command: "
       gets.chomp.split(",")
@@ -97,7 +97,7 @@ module Chess
               raise ChessGameError, "Missing source square" if from.nil? || from.empty?
               raise ChessGameError, "Missing target square" if to.nil? || to.empty?
 
-              #puts chess_game.check_piece_next_moves(square: from)
+              # puts chess_game.check_piece_next_moves(square: from)
 
               player_move = chess_game.play(from: from, to: to)
               round_move += player_move
@@ -113,7 +113,7 @@ module Chess
               repeat_turn = true
             rescue StandardError => e
               puts "\nNOTE: #{e}".colorize(color: :red)
-              #puts "\nNOTE: #{e.full_message}".colorize(color: :red)
+              # puts "\nNOTE: #{e.full_message}".colorize(color: :red)
               puts
               puts "#{player.name} (#{player.colour}), TRY AGAIN!"
                 .colorize(color: :black, background: :white)
@@ -125,6 +125,7 @@ module Chess
           end
 
           break if save_and_quit
+
           round_move += " "
         end
 
@@ -139,4 +140,3 @@ module Chess
     end
   end
 end
-
