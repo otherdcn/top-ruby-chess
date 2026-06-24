@@ -1,4 +1,5 @@
 require_relative "setup"
+require_relative "serialise"
 require_relative "../chess"
 require_relative "../record_moves"
 require "colorize"
@@ -7,6 +8,21 @@ module Chess
   class ChessGameError < StandardError; end
 
   class Control
+    GameStateData = Struct.new("GameStateData", :all_moves, :round, :round_move, :game_over, :save_and_quit,
+                               :player_white, :player_black, :current_player_turn, :chess_game, keyword_init: true)
+
+    def initialize
+      @game_state_data = GameStateData.new(all_moves: [],
+                                           round: 1,
+                                           round_move: "",
+                                           game_over: false,
+                                           save_and_quit: false,
+                                           player_white: nil,
+                                           player_black: nil,
+                                           current_player_turn: nil,
+                                           chess_game: nil)
+    end
+
     def start
       puts "Would you like to play:"
       puts "1. Start new game"
@@ -16,10 +32,11 @@ module Chess
       game_option = gets.chomp.to_i
 
       if game_option == 1
-        play(setup_new_game)
+        setup_new_game
+        play
       elsif game_option == 2
         puts "** NOT YET AVAILABLE **"
-        # play(setup_old_game)
+        # play
       else
         puts "Unknown option #{game_option}!"
       end
@@ -35,7 +52,7 @@ module Chess
       puts "\nSetting New Game..."
       puts
 
-      @player_white, @player_black = Chess::Setup.create_palyers
+      @game_state_data.player_white, @game_state_data.player_black = Chess::Setup.create_palyers
       chess_board                 = Chess::Setup.create_chess_board
       chess_pieces_white          = Chess::Setup.create_chess_pieces(colour: "White")
       chess_pieces_black          = Chess::Setup.create_chess_pieces(colour: "Black")
@@ -44,8 +61,8 @@ module Chess
                                        white: chess_pieces_white,
                                        black: chess_pieces_black)
 
-      Chess::Game.new(chess_board: chess_board,
-                      chess_moves: Chess::RecordMoves.new)
+      @game_state_data.chess_game = Chess::Game.new(chess_board: chess_board,
+                                                    chess_moves: Chess::RecordMoves.new)
     end
 
     def setup_old_game; end
@@ -58,25 +75,26 @@ module Chess
       gets.chomp.split(",")
     end
 
-    def play(chess_game)
-      all_moves = []
-      round = 1
-      game_over = false
-      save_and_quit = false
+    def play
+      @game_state_data.all_moves = []
+      @game_state_data.round = 1
+      @game_state_data.game_over = false
+      @game_state_data.save_and_quit = false
 
-      until game_over || save_and_quit
-        round_move = "#{round}. "
+      until @game_state_data.game_over || @game_state_data.save_and_quit
+        @game_state_data.round_move = "#{@game_state_data.round}. "
 
-        [@player_white, @player_black].each do |player|
-          chess_game.player = player
+        [@game_state_data.player_white, @game_state_data.player_black].each do |current_player_turn|
+          @game_state_data.chess_game.player = current_player_turn
+          @game_state_data.current_player_turn = current_player_turn
 
-          if chess_game.end_game?
-            chess_game.announce_winner
-            game_over = true
+          if @game_state_data.chess_game.end_game?
+            @game_state_data.chess_game.announce_winner
+            @game_state_data.game_over = true
             break
           end
 
-          chess_game.display
+          @game_state_data.chess_game.display
           puts
           repeat_turn = true
 
@@ -86,10 +104,11 @@ module Chess
 
               if from == "s"
                 save
-                raise ChessGameError, "Save complete. Continuing Game..."
+                puts "Save complete".colorize(color: :green)
+                raise ChessGameError, "CONTINUING GAME..."
               elsif from == "sq"
                 save
-                save_and_quit = true
+                @game_state_data.save_and_quit = true
                 puts "\nQuitting Game...\n"
                 break
               end
@@ -97,17 +116,17 @@ module Chess
               raise ChessGameError, "Missing source square" if from.nil? || from.empty?
               raise ChessGameError, "Missing target square" if to.nil? || to.empty?
 
-              # puts chess_game.check_piece_next_moves(square: from)
+              # puts @game_state_data.chess_game.check_piece_next_moves(square: from)
 
-              player_move = chess_game.play(from: from, to: to)
-              round_move += player_move
+              player_move = @game_state_data.chess_game.play(from: from, to: to)
+              @game_state_data.round_move += player_move
 
               puts "NOTE: #{player_move}".colorize(color: :green)
               repeat_turn = false
             rescue ChessGameError => e
               puts "\nNOTE: #{e}".colorize(color: :red)
               puts
-              puts "#{player.name} (#{player.colour}), TRY AGAIN!"
+              puts "#{current_player_turn.name} (#{current_player_turn.colour}), TRY AGAIN!"
                 .colorize(color: :black, background: :white)
 
               repeat_turn = true
@@ -115,7 +134,7 @@ module Chess
               puts "\nNOTE: #{e}".colorize(color: :red)
               # puts "\nNOTE: #{e.full_message}".colorize(color: :red)
               puts
-              puts "#{player.name} (#{player.colour}), TRY AGAIN!"
+              puts "#{current_player_turn.name} (#{current_player_turn.colour}), TRY AGAIN!"
                 .colorize(color: :black, background: :white)
 
               repeat_turn = true
@@ -124,17 +143,17 @@ module Chess
             puts
           end
 
-          break if save_and_quit
+          break if @game_state_data.save_and_quit
 
-          round_move += " "
+          @game_state_data.round_move += " "
         end
 
-        round += 1
-        all_moves << round_move
+        @game_state_data.round += 1
+        @game_state_data.all_moves << @game_state_data.round_move
 
         puts "-----"
         print "Moves made: "
-        puts all_moves.join(" ").colorize(color: :yellow)
+        puts @game_state_data.all_moves.join(" ").colorize(color: :yellow)
         puts "-----"
       end
     end
