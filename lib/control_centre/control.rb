@@ -76,76 +76,11 @@ module Chess
     end
 
     def play
-      @game_state_data.all_moves = []
-      @game_state_data.round = 1
-      @game_state_data.game_over = false
-      @game_state_data.save_and_quit = false
-
       until @game_state_data.game_over || @game_state_data.save_and_quit
         @game_state_data.round_move = "#{@game_state_data.round}. "
 
         [@game_state_data.player_white, @game_state_data.player_black].each do |current_player_turn|
-          @game_state_data.chess_game.player = current_player_turn
-          @game_state_data.current_player_turn = current_player_turn
-
-          if @game_state_data.chess_game.end_game?
-            @game_state_data.chess_game.announce_winner
-            @game_state_data.game_over = true
-            break
-          end
-
-          @game_state_data.chess_game.display
-          puts
-          repeat_turn = true
-
-          while repeat_turn
-            begin
-              from, to = command_input
-
-              if from == "s"
-                save
-                puts "Save complete".colorize(color: :green)
-                raise ChessGameError, "CONTINUING GAME..."
-              elsif from == "sq"
-                save
-                @game_state_data.save_and_quit = true
-                puts "\nQuitting Game...\n"
-                break
-              end
-
-              raise ChessGameError, "Missing source square" if from.nil? || from.empty?
-              raise ChessGameError, "Missing target square" if to.nil? || to.empty?
-
-              # puts @game_state_data.chess_game.check_piece_next_moves(square: from)
-
-              player_move = @game_state_data.chess_game.play(from: from, to: to)
-              @game_state_data.round_move += player_move
-
-              puts "NOTE: #{player_move}".colorize(color: :green)
-              repeat_turn = false
-            rescue ChessGameError => e
-              puts "\nNOTE: #{e}".colorize(color: :red)
-              puts
-              puts "#{current_player_turn.name} (#{current_player_turn.colour}), TRY AGAIN!"
-                .colorize(color: :black, background: :white)
-
-              repeat_turn = true
-            rescue StandardError => e
-              puts "\nNOTE: #{e}".colorize(color: :red)
-              # puts "\nNOTE: #{e.full_message}".colorize(color: :red)
-              puts
-              puts "#{current_player_turn.name} (#{current_player_turn.colour}), TRY AGAIN!"
-                .colorize(color: :black, background: :white)
-
-              repeat_turn = true
-            end
-
-            puts
-          end
-
-          break if @game_state_data.save_and_quit
-
-          @game_state_data.round_move += " "
+          make_move(current_player_turn)
         end
 
         @game_state_data.round += 1
@@ -156,6 +91,72 @@ module Chess
         puts @game_state_data.all_moves.join(" ").colorize(color: :yellow)
         puts "-----"
       end
+    end
+
+    def make_move(current_player_turn)
+      @game_state_data.chess_game.player = current_player_turn
+      @game_state_data.current_player_turn = current_player_turn
+
+      if @game_state_data.chess_game.end_game?
+        @game_state_data.chess_game.announce_winner
+        @game_state_data.game_over = true
+        # break
+        return
+      end
+
+      @game_state_data.chess_game.display
+      puts
+      repeat_turn = true
+
+      while repeat_turn
+        begin
+          from, to = command_input
+
+          if from == "s"
+            save
+            puts "Save complete".colorize(color: :green)
+            raise ChessGameError, "CONTINUING GAME..."
+          elsif from == "sq"
+            save
+            @game_state_data.save_and_quit = true
+            puts "\nQuitting Game...\n"
+            break
+          end
+
+          raise ChessGameError, "Missing source square" if from.nil? || from.empty?
+          raise ChessGameError, "Missing target square" if to.nil? || to.empty?
+
+          # puts @game_state_data.chess_game.check_piece_next_moves(square: from)
+
+          player_move = @game_state_data.chess_game.play(from: from, to: to)
+          @game_state_data.round_move += player_move
+
+          puts "NOTE: #{player_move}".colorize(color: :green)
+          repeat_turn = false
+        rescue ChessGameError => e
+          puts "\nNOTE: #{e}".colorize(color: :red)
+          puts
+          puts "#{current_player_turn.name} (#{current_player_turn.colour}), TRY AGAIN!"
+            .colorize(color: :black, background: :white)
+
+          repeat_turn = true
+        rescue StandardError => e
+          puts "\nNOTE: #{e}".colorize(color: :red)
+          # puts "\nNOTE: #{e.full_message}".colorize(color: :red)
+          puts
+          puts "#{current_player_turn.name} (#{current_player_turn.colour}), TRY AGAIN!"
+            .colorize(color: :black, background: :white)
+
+          repeat_turn = true
+        end
+
+        puts
+      end
+
+      # break if @game_state_data.save_and_quit
+      return if @game_state_data.save_and_quit
+
+      @game_state_data.round_move += " "
     end
   end
 end
