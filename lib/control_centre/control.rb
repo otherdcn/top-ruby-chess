@@ -35,8 +35,8 @@ module Chess
         setup_new_game
         play
       elsif game_option == 2
-        puts "** NOT YET AVAILABLE **"
-        # play
+        setup_old_game
+        play
       else
         puts "Unknown option #{game_option}!"
       end
@@ -45,11 +45,15 @@ module Chess
     private
 
     def save
-      puts "** SAVING GAME **"
+      puts "** SAVING GAME **".colorize(color: :yellow)
+
+      Serialise.dump(@game_state_data)
+
+      puts "Save complete".colorize(color: :green)
     end
 
     def setup_new_game
-      puts "\nSetting New Game..."
+      puts "\nSetting New Game...".colorize(color: :yellow)
       puts
 
       @game_state_data.player_white, @game_state_data.player_black = Chess::Setup.create_palyers
@@ -65,7 +69,21 @@ module Chess
                                                     chess_moves: Chess::RecordMoves.new)
     end
 
-    def setup_old_game; end
+    def setup_old_game
+      puts "\n*** LOADING GAME ***".colorize(color: :yellow)
+
+      @game_state_data = Serialise.load
+
+      @game_state_data.save_and_quit = false
+      @reloaded_mid_round = true if @game_state_data.current_player_turn == @game_state_data.player_black
+
+      puts "\nLoad complete\n".colorize(color: :green)
+      puts "CONTINUING FROM WHERE WE LEFT OFF...".colorize(color: :yellow)
+    end
+
+    def reloaded_mid_round?
+      @reloaded_mid_round
+    end
 
     def command_input
       puts "> Enter 'start' and 'end' square seperated by comma to move piece, e.g. a2,a4"
@@ -77,10 +95,17 @@ module Chess
 
     def play
       until @game_state_data.game_over || @game_state_data.save_and_quit
-        @game_state_data.round_move = "#{@game_state_data.round}. "
 
-        [@game_state_data.player_white, @game_state_data.player_black].each do |current_player_turn|
-          make_move(current_player_turn)
+        if reloaded_mid_round?
+          make_move(@game_state_data.player_black) if reloaded_mid_round?
+          @reloaded_mid_round = false
+        else
+          @game_state_data.round_move = "#{@game_state_data.round}. "
+
+          [@game_state_data.player_white, @game_state_data.player_black].each do |current_player_turn|
+            make_move(current_player_turn)
+            break if @game_state_data.save_and_quit
+          end
         end
 
         @game_state_data.round += 1
@@ -100,7 +125,6 @@ module Chess
       if @game_state_data.chess_game.end_game?
         @game_state_data.chess_game.announce_winner
         @game_state_data.game_over = true
-        # break
         return
       end
 
@@ -114,7 +138,6 @@ module Chess
 
           if from == "s"
             save
-            puts "Save complete".colorize(color: :green)
             raise ChessGameError, "CONTINUING GAME..."
           elsif from == "sq"
             save
@@ -126,14 +149,15 @@ module Chess
           raise ChessGameError, "Missing source square" if from.nil? || from.empty?
           raise ChessGameError, "Missing target square" if to.nil? || to.empty?
 
-          # puts @game_state_data.chess_game.check_piece_next_moves(square: from)
-
           player_move = @game_state_data.chess_game.play(from: from, to: to)
           @game_state_data.round_move += player_move
 
           puts "NOTE: #{player_move}".colorize(color: :green)
           repeat_turn = false
         rescue ChessGameError => e
+          # puts "Type: #{e.class}"
+          # puts "Message: #{e.message}"
+          # puts "First line of trace: #{e.backtrace.first}"
           puts "\nNOTE: #{e}".colorize(color: :red)
           puts
           puts "#{current_player_turn.name} (#{current_player_turn.colour}), TRY AGAIN!"
@@ -141,8 +165,11 @@ module Chess
 
           repeat_turn = true
         rescue StandardError => e
+          # puts "Type: #{e.class}"
+          # puts "Message: #{e.message}"
+          # puts "First line of trace: #{e.backtrace.first}"
           puts "\nNOTE: #{e}".colorize(color: :red)
-          # puts "\nNOTE: #{e.full_message}".colorize(color: :red)
+          puts "\nNOTE: #{e.full_message}".colorize(color: :red)
           puts
           puts "#{current_player_turn.name} (#{current_player_turn.colour}), TRY AGAIN!"
             .colorize(color: :black, background: :white)
@@ -153,7 +180,6 @@ module Chess
         puts
       end
 
-      # break if @game_state_data.save_and_quit
       return if @game_state_data.save_and_quit
 
       @game_state_data.round_move += " "
