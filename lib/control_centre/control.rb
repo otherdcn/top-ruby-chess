@@ -104,7 +104,7 @@ module Chess
 
           [@game_state_data.player_white, @game_state_data.player_black].each do |current_player_turn|
             make_move(current_player_turn)
-            break if @game_state_data.save_and_quit
+            break if @game_state_data.save_and_quit || @game_state_data.game_over
           end
         end
 
